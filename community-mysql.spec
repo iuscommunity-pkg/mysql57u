@@ -2,7 +2,7 @@
 %global pkgname      community-mysql
 %global pkgnamepatch community-mysql
 
-# Regression tests may take a long time (many cores recommended), skip them by 
+# Regression tests may take a long time (many cores recommended), skip them by
 # passing --nocheck to rpmbuild or by setting runselftest to 0 if defining
 # --nocheck is not possible (e.g. in koji build)
 %{!?runselftest:%global runselftest 1}
@@ -10,7 +10,7 @@
 # set to 1 to enable
 %global with_shared_lib_major_hack 1
 
-# use Full RELRO for all binaries (RHBZ#1092548)
+# Use Full RELRO for all binaries (RHBZ#1092548)
 %global _hardened_build 1
 
 # By default, patch(1) creates backup files when chunks apply with offsets.
@@ -41,12 +41,11 @@
 %if 0%{?fedora} >= 15 || 0%{?rhel} >= 7
 %bcond_without init_systemd
 %bcond_with init_sysv
-%global daemon_name mysqld
 %else
 %bcond_with init_systemd
 %bcond_without init_sysv
-%global daemon_name mysqld
 %endif
+%global daemon_name mysqld
 
 # We define some system's well known locations here so we can use them easily
 # later when building to another location (like SCL)
@@ -59,13 +58,14 @@
 
 # Provide mysql names for compatibility
 %bcond_without mysql_names
+%bcond_without conflicts
 
 # Make long macros shorter
 %global sameevr   %{?epoch:%{epoch}:}%{version}-%{release}
 
 Name:             %{pkgname}
 Version:          5.6.22
-Release:          2%{?with_debug:.debug}%{?dist}
+Release:          3%{?with_debug:.debug}%{?dist}
 Summary:          MySQL client programs and shared libraries
 Group:            Applications/Databases
 URL:              http://www.mysql.com
@@ -153,7 +153,7 @@ Provides:         mysql-compat-client = %{sameevr}
 Provides:         mysql-compat-client%{?_isa} = %{sameevr}
 %endif
 
-Conflicts:        mariadb
+%{?with_conflicts:Conflicts:        mariadb}
 # mysql-cluster used to be built from this SRPM, but no more
 Obsoletes:        mysql-cluster < 5.1.44
 
@@ -163,7 +163,7 @@ Obsoletes:        mysql-cluster < 5.1.44
 %global __provides_exclude_from ^(%{_datadir}/(mysql|mysql-test)/.*|%{_libdir}/mysql/plugin/.*\\.so)$
 %else
 %filter_from_requires /perl(\(hostnames\|lib::mtr\|lib::v1\|mtr_\|My::\)/d
-%filter_provides_in -P (%{_datadir}/(mysql|mysql-test)/.*|%{_libdir}/mysql/plugin/.*\\.so)$
+%filter_provides_in -P (%{_datadir}/(mysql|mysql-test)/.*|%{_libdir}/mysql/plugin/.*\.so)
 %filter_setup
 %endif
 
@@ -263,8 +263,8 @@ Provides:         mysql-server%{?_isa} = %{sameevr}
 Provides:         mysql-compat-server = %{sameevr}
 Provides:         mysql-compat-server%{?_isa} = %{sameevr}
 %endif
-Conflicts:        mariadb-server
-Conflicts:        mariadb-galera-server
+%{?with_conflicts:Conflicts:        mariadb-server}
+%{?with_conflicts:Conflicts:        mariadb-galera-server}
 
 %description      server
 MySQL is a multi-user, multi-threaded SQL database server. MySQL is a
@@ -279,7 +279,7 @@ Summary:          Files for development of MySQL applications
 Group:            Applications/Databases
 Requires:         %{name}-libs%{?_isa} = %{sameevr}
 Requires:         openssl-devel%{?_isa}
-Conflicts:        mariadb-devel
+%{?with_conflicts:Conflicts:        mariadb-devel}
 
 %description      devel
 MySQL is a multi-user, multi-threaded SQL database server. This
@@ -310,7 +310,7 @@ Summary:          Development files for MySQL as an embeddable library
 Group:            Applications/Databases
 Requires:         %{name}-embedded%{?_isa} = %{sameevr}
 Requires:         %{name}-devel%{?_isa} = %{sameevr}
-Conflicts:        mariadb-embedded-devel
+%{?with_conflicts:Conflicts:        mariadb-embedded-devel}
 
 %description      embedded-devel
 MySQL is a multi-user, multi-threaded SQL database server. This
@@ -324,7 +324,7 @@ the embedded version of the MySQL server.
 Summary:          MySQL benchmark scripts and data
 Group:            Applications/Databases
 Requires:         %{name}%{?_isa} = %{sameevr}
-Conflicts:        mariadb-bench
+%{?with_conflicts:Conflicts:        mariadb-bench}
 %if %{with mysql_names}
 Provides:         mysql-bench = %{sameevr}
 Provides:         mysql-bench%{?_isa} = %{sameevr}
@@ -355,7 +355,7 @@ Requires:         perl(Socket)
 Requires:         perl(Sys::Hostname)
 Requires:         perl(Test::More)
 Requires:         perl(Time::HiRes)
-Conflicts:        mariadb-test
+%{?with_conflicts:Conflicts:        mariadb-test}
 %if %{with mysql_names}
 Provides:         mysql-test = %{sameevr}
 Provides:         mysql-test%{?_isa} = %{sameevr}
@@ -477,8 +477,8 @@ cmake .. \
          -DINSTALL_SCRIPTDIR=bin \
          -DINSTALL_SQLBENCHDIR=share \
          -DINSTALL_SUPPORTFILESDIR=share/%{name} \
-         -DMYSQL_DATADIR="%{_localstatedir}/lib/mysql" \
-         -DMYSQL_UNIX_ADDR="%{_localstatedir}/lib/mysql/mysql.sock" \
+         -DMYSQL_DATADIR="%{dbdatadir}" \
+         -DMYSQL_UNIX_ADDR="/var/lib/mysql/mysql.sock" \
          -DENABLED_LOCAL_INFILE=ON \
          -DENABLE_DTRACE=ON \
          -DWITH_INNODB_MEMCACHED=ON \
@@ -527,7 +527,7 @@ mkdir -p %{buildroot}%{logfiledir}
 touch %{buildroot}%{logfile}
 
 mkdir -p %{buildroot}%{_localstatedir}/run/%{daemon_name}
-install -p -m 0755 -d %{buildroot}%{_localstatedir}/lib/mysql
+install -p -m 0755 -d %{buildroot}%{dbdatadir}
 
 %if %{with config}
 install -D -p -m 0644 scripts/my.cnf %{buildroot}%{_sysconfdir}/my.cnf
@@ -541,7 +541,7 @@ install -D -p -m 0644 scripts/mysql.tmpfiles.d %{buildroot}%{_tmpfilesdir}/%{nam
 
 # install SysV init script
 %if %{with init_sysv}
-install -D -p -m 755 scripts/mysql.init %{buildroot}%{_initddir}/%{daemon_name}
+install -D -p -m 755 scripts/mysql.init %{buildroot}%{daemondir}/%{daemon_name}
 %endif
 
 # helper scripts for service starting
@@ -695,6 +695,7 @@ if [ $1 = 1 ]; then
 fi
 %endif
 /bin/touch %{logfile}
+/bin/chmod 0755 %{dbdatadir}
 
 %preun server
 %if %{with init_systemd}
@@ -762,7 +763,6 @@ fi
 
 %if %{with clibrary}
 %files libs
-%dir %{_libdir}/mysql
 %{_libdir}/mysql/libmysqlclient*.so.*
 %config(noreplace) %{_sysconfdir}/ld.so.conf.d/*
 %endif
@@ -771,14 +771,15 @@ fi
 %files config
 # although the default my.cnf contains only server settings, we put it in the
 # common package because it can be used for client settings too.
-%config(noreplace) %{_sysconfdir}/my.cnf
 %dir %{_sysconfdir}/my.cnf.d
+%config(noreplace) %{_sysconfdir}/my.cnf
 %endif
 
 %if %{with common}
 %files common
 %doc README COPYING README.mysql-license README.mysql-docs
 %doc storage/innobase/COPYING.Percona storage/innobase/COPYING.Google
+%dir %{_libdir}/mysql
 %dir %{_datadir}/%{name}
 %{_datadir}/%{name}/charsets
 %endif
@@ -885,8 +886,7 @@ fi
 %{_datadir}/%{name}/mysql_test_data_timezone.sql
 %{_datadir}/%{name}/my-*.cnf
 
-%{?with_init_systemd:%{_unitdir}/%{daemon_name}.service}
-%{?with_init_sysv:%{_initddir}/%{daemon_name}}
+%{daemondir}/%{daemon_name}*
 %{_libexecdir}/mysql-prepare-db-dir
 %{_libexecdir}/mysql-wait-ready
 %{_libexecdir}/mysql-check-socket
@@ -894,8 +894,10 @@ fi
 %{_libexecdir}/mysql-scripts-common
 
 %{?with_init_systemd:%{_tmpfilesdir}/%{name}.conf}
+%attr(0755,mysql,mysql) %dir %{dbdatadir}
 %attr(0755,mysql,mysql) %dir %{_localstatedir}/run/%{daemon_name}
 %attr(0755,mysql,mysql) %dir %{_localstatedir}/lib/mysql
+%attr(0750,mysql,mysql) %dir %{logfiledir}
 %attr(0640,mysql,mysql) %config %ghost %verify(not md5 size mtime) %{logfile}
 %config(noreplace) %{logrotateddir}/%{daemon_name}
 
@@ -936,6 +938,11 @@ fi
 %endif
 
 %changelog
+* Sat Jan 24 2015 Honza Horak <hhorak@redhat.com> - 5.6.22-3
+- Fix path for sysconfig file
+  Filter provides in el6 properly
+  Fix initscript file location
+
 * Mon Jan 12 2015 Honza Horak <hhorak@redhat.com> - 5.6.22-2
 - Add configuration file for server
 
