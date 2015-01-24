@@ -65,7 +65,7 @@
 
 Name:             %{pkgname}
 Version:          5.6.22
-Release:          3%{?with_debug:.debug}%{?dist}
+Release:          4%{?with_debug:.debug}%{?dist}
 Summary:          MySQL client programs and shared libraries
 Group:            Applications/Databases
 URL:              http://www.mysql.com
@@ -550,7 +550,7 @@ install -p -m 755 scripts/mysql-wait-ready %{buildroot}%{_libexecdir}/mysql-wait
 install -p -m 755 scripts/mysql-check-socket %{buildroot}%{_libexecdir}/mysql-check-socket
 install -p -m 755 scripts/mysql-check-upgrade %{buildroot}%{_libexecdir}/mysql-check-upgrade
 install -p -m 644 scripts/mysql-scripts-common %{buildroot}%{_libexecdir}/mysql-scripts-common
-install -D -p -m 0644 scripts/server.cnf %{buildroot}%{_sysconfdir}/my.cnf.d/server.cnf
+install -D -p -m 0644 scripts/server.cnf %{buildroot}%{_sysconfdir}/my.cnf.d/%{pkgname}-server.cnf
 
 # mysql-test includes one executable that doesn't belong under /usr/share,
 # so move it and provide a symlink
@@ -838,7 +838,7 @@ fi
 %{_bindir}/resolve_stack_dump
 %{_bindir}/resolveip
 
-%config(noreplace) %{_sysconfdir}/my.cnf.d/server.cnf
+%config(noreplace) %{_sysconfdir}/my.cnf.d/%{pkgname}-server.cnf
 
 %{_libexecdir}/mysqld
 
@@ -938,6 +938,9 @@ fi
 %endif
 
 %changelog
+* Sat Jan 24 2015 Honza Horak <hhorak@redhat.com> - 5.6.22-4
+- Move server settings to renamed config file under my.cnf.d dir
+
 * Sat Jan 24 2015 Honza Horak <hhorak@redhat.com> - 5.6.22-3
 - Fix path for sysconfig file
   Filter provides in el6 properly
