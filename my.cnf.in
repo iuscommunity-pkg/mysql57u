@@ -14,5 +14,5 @@ symbolic-links=0
 #
 # include all files from the config directory
 #
-!includedir @INSTALL_SYSCONF2DIR@
+!includedir @SYSCONF2DIR@
 

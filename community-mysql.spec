@@ -74,7 +74,7 @@
 
 Name:             community-mysql
 Version:          5.6.22
-Release:          4%{?with_debug:.debug}%{?dist}
+Release:          5%{?with_debug:.debug}%{?dist}
 Summary:          MySQL client programs and shared libraries
 Group:            Applications/Databases
 URL:              http://www.mysql.com
@@ -468,6 +468,7 @@ cmake .. \
          -DNICE_PROJECT_NAME="MySQL" \
          -DCMAKE_INSTALL_PREFIX="%{_prefix}" \
          -DSYSCONFDIR="%{_sysconfdir}" \
+         -DSYSCONF2DIR="%{_sysconfdir}/my.cnf.d" \
          -DINSTALL_DOCDIR="share/doc/%{_pkgdocdirname}" \
          -DINSTALL_DOCREADMEDIR="share/doc/%{_pkgdocdirname}" \
          -DINSTALL_INCLUDEDIR=include/mysql \
@@ -699,7 +700,6 @@ if [ $1 = 1 ]; then
 fi
 %endif
 /bin/touch %{logfile}
-/bin/chmod 0755 %{dbdatadir}
 
 %preun server
 %if %{with init_systemd}
@@ -942,6 +942,9 @@ fi
 %endif
 
 %changelog
+* Sun Jan 25 2015 Honza Horak <hhorak@redhat.com> - 5.6.22-5
+- Use correct dir for config files
+
 * Sat Jan 24 2015 Honza Horak <hhorak@redhat.com> - 5.6.22-4
 - Move server settings to renamed config file under my.cnf.d dir
 
