@@ -74,7 +74,7 @@
 
 Name:             community-mysql
 Version:          5.6.22
-Release:          5%{?with_debug:.debug}%{?dist}
+Release:          6%{?with_debug:.debug}%{?dist}
 Summary:          MySQL client programs and shared libraries
 Group:            Applications/Databases
 URL:              http://www.mysql.com
@@ -901,7 +901,6 @@ fi
 %attr(0755,mysql,mysql) %dir %{dbdatadir}
 %attr(0755,mysql,mysql) %dir %{_localstatedir}/run/%{daemon_name}
 %attr(0755,mysql,mysql) %dir %{_localstatedir}/lib/mysql
-%attr(0750,mysql,mysql) %dir %{logfiledir}
 %attr(0640,mysql,mysql) %config %ghost %verify(not md5 size mtime) %{logfile}
 %config(noreplace) %{logrotateddir}/%{daemon_name}
 
@@ -942,6 +941,9 @@ fi
 %endif
 
 %changelog
+* Mon Jan 26 2015 Honza Horak <hhorak@redhat.com> - 5.6.22-6
+- Do not own /var/log
+
 * Sun Jan 25 2015 Honza Horak <hhorak@redhat.com> - 5.6.22-5
 - Use correct dir for config files
 
