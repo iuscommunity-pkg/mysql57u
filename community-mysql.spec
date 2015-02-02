@@ -73,8 +73,8 @@
 %global sameevr   %{?epoch:%{epoch}:}%{version}-%{release}
 
 Name:             community-mysql
-Version:          5.6.22
-Release:          6%{?with_debug:.debug}%{?dist}
+Version:          5.6.23
+Release:          1%{?with_debug:.debug}%{?dist}
 Summary:          MySQL client programs and shared libraries
 Group:            Applications/Databases
 URL:              http://www.mysql.com
@@ -116,7 +116,6 @@ Patch9:           %{pkgnamepatch}-install-db-sharedir.patch
 Patch10:          %{pkgnamepatch}-paths.patch
 
 # Patches specific for this mysql package
-Patch50:          %{pkgnamepatch}-expired-certs.patch
 Patch51:          %{pkgnamepatch}-chain-certs.patch
 Patch52:          %{pkgnamepatch}-sharedir.patch
 Patch53:          %{pkgnamepatch}-5.6.16-libmysql-version.patch
@@ -389,7 +388,6 @@ the MySQL sources.
 %patch8 -p1
 %patch9 -p1
 %patch10 -p1
-%patch50 -p1
 %patch51 -p1
 %patch52 -p1
 %patch53 -p1
@@ -941,6 +939,14 @@ fi
 %endif
 
 %changelog
+* Thu Jan 29 2015 Bjorn Munch <bjorn.munch@oracle.com> - 5.6.23-1
+- Update to MySQL 5.6.23, for various fixes described at
+  https://dev.mysql.com/doc/relnotes/mysql/5.6/en/news-5-6-23.html
+- Expired certs patch now obsolete
+- Fixed changelog
+- Refreshed file contents patch
+- Fix typo in server.cnf.in
+
 * Mon Jan 26 2015 Honza Horak <hhorak@redhat.com> - 5.6.22-6
 - Do not own /var/log
 
