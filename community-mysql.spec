@@ -100,6 +100,7 @@ Source13:         mysql-wait-ready.sh
 Source14:         mysql-check-socket.sh
 Source15:         mysql-scripts-common.sh
 Source16:         mysql-check-upgrade.sh
+Source17:         mysql-wait-stop.sh
 Source19:         mysql.init.in
 # To track rpmlint warnings
 Source30:         mysql-5.6.10-rpmlintrc
@@ -440,7 +441,7 @@ add_test 'main.upgrade             : unknown'
 popd
 
 cp %{SOURCE2} %{SOURCE3} %{SOURCE10} %{SOURCE11} %{SOURCE12} %{SOURCE13} \
-   %{SOURCE14} %{SOURCE15} %{SOURCE16} %{SOURCE19} %{SOURCE31} scripts
+   %{SOURCE14} %{SOURCE15} %{SOURCE16} %{SOURCE17} %{SOURCE19} %{SOURCE31} scripts
 
 %build
 # fail quickly and obviously if user tries to build as root
@@ -553,6 +554,7 @@ install -D -p -m 755 scripts/mysql.init %{buildroot}%{daemondir}/%{daemon_name}
 # helper scripts for service starting
 install -p -m 755 scripts/mysql-prepare-db-dir %{buildroot}%{_libexecdir}/mysql-prepare-db-dir
 install -p -m 755 scripts/mysql-wait-ready %{buildroot}%{_libexecdir}/mysql-wait-ready
+install -p -m 755 scripts/mysql-wait-stop %{buildroot}%{_libexecdir}/mysql-wait-stop
 install -p -m 755 scripts/mysql-check-socket %{buildroot}%{_libexecdir}/mysql-check-socket
 install -p -m 755 scripts/mysql-check-upgrade %{buildroot}%{_libexecdir}/mysql-check-upgrade
 install -p -m 644 scripts/mysql-scripts-common %{buildroot}%{_libexecdir}/mysql-scripts-common
@@ -894,6 +896,7 @@ fi
 %{daemondir}/%{daemon_name}*
 %{_libexecdir}/mysql-prepare-db-dir
 %{_libexecdir}/mysql-wait-ready
+%{_libexecdir}/mysql-wait-stop
 %{_libexecdir}/mysql-check-socket
 %{_libexecdir}/mysql-check-upgrade
 %{_libexecdir}/mysql-scripts-common
@@ -947,6 +950,8 @@ fi
   Based on https://www.redhat.com/archives/sclorg/2015-February/msg00038.html
 - Check permissions when starting service on RHEL-6
   Resolves: #1194699
+- Wait for daemon ends
+  Related: #1072958
 
 * Mon Feb 23 2015 Honza Horak <hhorak@redhat.com> - 5.6.23-3
 - Expand paths in perl scripts in mysql-test
