@@ -939,6 +939,7 @@ fi
 %changelog
 * Mon Feb 23 2015 Honza Horak <hhorak@redhat.com> - 5.6.23-3
 - Expand paths in perl scripts in mysql-test
+- Use correct path in install_db script warning
 
 * Thu Jan 29 2015 Bjorn Munch <bjorn.munch@oracle.com> - 5.6.23-1
 - Update to MySQL 5.6.23, for various fixes described at
