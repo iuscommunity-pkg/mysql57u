@@ -74,7 +74,7 @@
 
 Name:             community-mysql
 Version:          5.6.23
-Release:          1%{?with_debug:.debug}%{?dist}
+Release:          3%{?with_debug:.debug}%{?dist}
 Summary:          MySQL client programs and shared libraries
 Group:            Applications/Databases
 URL:              http://www.mysql.com
@@ -937,6 +937,9 @@ fi
 %endif
 
 %changelog
+* Mon Feb 23 2015 Honza Horak <hhorak@redhat.com> - 5.6.23-3
+- Expand paths in perl scripts in mysql-test
+
 * Thu Jan 29 2015 Bjorn Munch <bjorn.munch@oracle.com> - 5.6.23-1
 - Update to MySQL 5.6.23, for various fixes described at
   https://dev.mysql.com/doc/relnotes/mysql/5.6/en/news-5-6-23.html
