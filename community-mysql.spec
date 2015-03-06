@@ -289,7 +289,7 @@ the MySQL server and some accompanying files and directories.
 %package          devel
 Summary:          Files for development of MySQL applications
 Group:            Applications/Databases
-Requires:         %{name}-libs%{?_isa} = %{sameevr}
+%{?with_clibrary:Requires:         %{name}-libs%{?_isa} = %{sameevr}}
 Requires:         openssl-devel%{?_isa}
 %{?with_conflicts:Conflicts:        mariadb-devel}
 
