@@ -78,7 +78,7 @@
 
 Name:             community-mysql
 Version:          5.6.24
-Release:          1%{?with_debug:.debug}%{?dist}
+Release:          2%{?with_debug:.debug}%{?dist}
 Summary:          MySQL client programs and shared libraries
 Group:            Applications/Databases
 URL:              http://www.mysql.com
@@ -119,6 +119,7 @@ Patch7:           %{pkgnamepatch}-dh1024.patch
 Patch8:           %{pkgnamepatch}-scripts.patch
 Patch9:           %{pkgnamepatch}-install-db-sharedir.patch
 Patch10:          %{pkgnamepatch}-paths.patch
+Patch11:          %{pkgnamepatch}-gcc5.patch
 
 # Patches specific for this mysql package
 Patch51:          %{pkgnamepatch}-chain-certs.patch
@@ -392,6 +393,7 @@ the MySQL sources.
 %patch8 -p1
 %patch9 -p1
 %patch10 -p1
+%patch11 -p1
 %patch51 -p1
 %patch52 -p1
 %patch53 -p1
@@ -949,6 +951,9 @@ fi
 %endif
 
 %changelog
+* Fri Apr 10 2015 Honza Horak <hhorak@redhat.com> - 5.6.24-2
+- Fix for big integers on gcc5
+
 * Thu Apr 09 2015 Honza Horak <hhorak@redhat.com> - 5.6.24-1
 - Update to 5.6.24
 

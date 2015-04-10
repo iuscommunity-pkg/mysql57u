@@ -1,0 +1,60 @@
+commit b377595b246be1de01c37f1d0269b5821e19b3fb
+Author: Tor Didriksen <tor.didriksen@oracle.com>
+Date:   Wed Apr 8 16:53:55 2015 +0200
+
+    Bug#20768820 MAIN.BIGINT TEST FAILS WHEN BUILT WITH GCC 5 IN RELEASE BUILD
+    
+    Problem: with gcc5 in optmized mode, (- LLONG_MIN ) yields integer overflow.
+    Fix: In ull2dec() change the loop which counts the number of decimal_digit_t's
+    (cherry picked from commit b37d8bcc24f82f8e15c5f6e2243c8937af74acb7)
+
+diff --git a/strings/decimal.c b/strings/decimal.c
+index 0d47241..ccb4a6b 100644
+--- a/strings/decimal.c
++++ b/strings/decimal.c
+@@ -1064,26 +1064,34 @@ int double2decimal(double from, decimal_t *to)
+ 
+ static int ull2dec(ulonglong from, decimal_t *to)
+ {
+-  int intg1, error=E_DEC_OK;
+-  ulonglong x=from;
++  int intg1;
++  int error= E_DEC_OK;
++  ulonglong x= from;
+   dec1 *buf;
+ 
+   sanity(to);
+ 
+-  for (intg1=1; from >= DIG_BASE; intg1++, from/=DIG_BASE) ;
++  if (from == 0)
++    intg1= 1;
++  else
++  {
++    /* Count the number of decimal_digit_t's we need. */
++    for (intg1= 0; from != 0; intg1++, from/= DIG_BASE)
++      ;
++  }
+   if (unlikely(intg1 > to->len))
+   {
+-    intg1=to->len;
+-    error=E_DEC_OVERFLOW;
++    intg1= to->len;
++    error= E_DEC_OVERFLOW;
+   }
+-  to->frac=0;
+-  to->intg=intg1*DIG_PER_DEC1;
++  to->frac= 0;
++  to->intg= intg1 * DIG_PER_DEC1;
+ 
+-  for (buf=to->buf+intg1; intg1; intg1--)
++  for (buf= to->buf + intg1; intg1; intg1--)
+   {
+-    ulonglong y=x/DIG_BASE;
+-    *--buf=(dec1)(x-y*DIG_BASE);
+-    x=y;
++    ulonglong y= x / DIG_BASE;
++    *--buf=(dec1)(x - y * DIG_BASE);
++    x= y;
+   }
+   return error;
+ }
