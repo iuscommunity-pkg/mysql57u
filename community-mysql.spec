@@ -78,7 +78,7 @@
 
 Name:             community-mysql
 Version:          5.6.24
-Release:          2%{?with_debug:.debug}%{?dist}
+Release:          3%{?with_debug:.debug}%{?dist}
 Summary:          MySQL client programs and shared libraries
 Group:            Applications/Databases
 URL:              http://www.mysql.com
@@ -127,7 +127,6 @@ Patch52:          %{pkgnamepatch}-sharedir.patch
 Patch53:          %{pkgnamepatch}-5.6.16-libmysql-version.patch
 Patch55:          %{pkgnamepatch}-5.6.16-mysql-install.patch
 Patch56:          %{pkgnamepatch}-pluginerrmsg.patch
-Patch57:          %{pkgnamepatch}-5.6.19-gcc49-aarch64-opt.patch
 Patch70:          %{pkgnamepatch}-5.6.13-major.patch
 
 BuildRequires:    cmake
@@ -399,7 +398,6 @@ the MySQL sources.
 %patch53 -p1
 %patch55 -p1
 %patch56 -p1
-%patch57 -p1
 %if %{with_shared_lib_major_hack}
 %patch70 -p1
 %endif
@@ -951,6 +949,9 @@ fi
 %endif
 
 %changelog
+* Thu Apr 23 2015 Bjorn Munch <bjorn.munch@oracle.com> - 5.6.24-3
+- gcc5 makes gcc49-aarch64 patch obsolete (and wrong)
+
 * Fri Apr 10 2015 Honza Horak <hhorak@redhat.com> - 5.6.24-2
 - Fix for big integers on gcc5
 
