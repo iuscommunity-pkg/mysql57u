@@ -78,7 +78,7 @@
 
 Name:             community-mysql
 Version:          5.6.24
-Release:          3%{?with_debug:.debug}%{?dist}
+Release:          4%{?with_debug:.debug}%{?dist}
 Summary:          MySQL client programs and shared libraries
 Group:            Applications/Databases
 URL:              http://www.mysql.com
@@ -949,6 +949,9 @@ fi
 %endif
 
 %changelog
+* Wed Jun 17 2015 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 5.6.24-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_23_Mass_Rebuild
+
 * Thu Apr 23 2015 Bjorn Munch <bjorn.munch@oracle.com> - 5.6.24-3
 - gcc5 makes gcc49-aarch64 patch obsolete (and wrong)
 
