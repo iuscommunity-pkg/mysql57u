@@ -77,8 +77,8 @@
 %global sameevr   %{?epoch:%{epoch}:}%{version}-%{release}
 
 Name:             community-mysql
-Version:          5.6.24
-Release:          4%{?with_debug:.debug}%{?dist}
+Version:          5.6.25
+Release:          1%{?with_debug:.debug}%{?dist}
 Summary:          MySQL client programs and shared libraries
 Group:            Applications/Databases
 URL:              http://www.mysql.com
@@ -119,7 +119,6 @@ Patch7:           %{pkgnamepatch}-dh1024.patch
 Patch8:           %{pkgnamepatch}-scripts.patch
 Patch9:           %{pkgnamepatch}-install-db-sharedir.patch
 Patch10:          %{pkgnamepatch}-paths.patch
-Patch11:          %{pkgnamepatch}-gcc5.patch
 
 # Patches specific for this mysql package
 Patch51:          %{pkgnamepatch}-chain-certs.patch
@@ -392,7 +391,6 @@ the MySQL sources.
 %patch8 -p1
 %patch9 -p1
 %patch10 -p1
-%patch11 -p1
 %patch51 -p1
 %patch52 -p1
 %patch53 -p1
@@ -949,6 +947,9 @@ fi
 %endif
 
 %changelog
+* Tue Jul 21 2015 Jakub Dorňák <jdornak@redhat.com> - 5.6.25-1
+- Update to 5.6.25
+
 * Wed Jun 17 2015 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 5.6.24-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_23_Mass_Rebuild
 
