@@ -415,6 +415,7 @@ rm -f t/ssl_8k_key-master.opt
 add_test 'perfschema.func_file_io  : rh 741325'
 add_test 'perfschema.func_mutex    : rh 741325'
 add_test 'perfschema.setup_objects : rh 741325'
+add_test 'perfschema.global_read_lock :  77889'
 %endif
 
 # Archs with collation issues, bugs.mysql.com/46895
