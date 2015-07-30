@@ -77,7 +77,7 @@
 %global sameevr   %{?epoch:%{epoch}:}%{version}-%{release}
 
 Name:             community-mysql
-Version:          5.6.25
+Version:          5.6.26
 Release:          1%{?with_debug:.debug}%{?dist}
 Summary:          MySQL client programs and shared libraries
 Group:            Applications/Databases
@@ -115,7 +115,6 @@ Patch3:           %{pkgnamepatch}-s390-tsc.patch
 Patch4:           %{pkgnamepatch}-logrotate.patch
 Patch5:           %{pkgnamepatch}-cipherspec.patch
 Patch6:           %{pkgnamepatch}-file-contents.patch
-Patch7:           %{pkgnamepatch}-dh1024.patch
 Patch8:           %{pkgnamepatch}-scripts.patch
 Patch9:           %{pkgnamepatch}-install-db-sharedir.patch
 Patch10:          %{pkgnamepatch}-paths.patch
@@ -387,7 +386,6 @@ the MySQL sources.
 %patch4 -p1
 %patch5 -p1
 %patch6 -p1
-%patch7 -p1
 %patch8 -p1
 %patch9 -p1
 %patch10 -p1
@@ -947,6 +945,9 @@ fi
 %endif
 
 %changelog
+* Thu Jul 30 2015 Jakub Dorňák <jdornak@redhat.com> - 5.6.26-1
+- Update to 5.6.26
+
 * Tue Jul 21 2015 Jakub Dorňák <jdornak@redhat.com> - 5.6.25-1
 - Update to 5.6.25
 
