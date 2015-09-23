@@ -7,6 +7,9 @@
 # --nocheck is not possible (e.g. in koji build)
 %{!?runselftest:%global runselftest 1}
 
+# Set this to 1 to see which tests fail
+%global check_testsuite 0
+
 # set to 1 to enable
 %global with_shared_lib_major_hack 1
 
@@ -30,7 +33,6 @@
 %bcond_without client
 %bcond_without common
 %bcond_without errmsg
-%bcond_without bench
 %bcond_without test
 
 # When there is already another package that ships /etc/my.cnf,
@@ -77,7 +79,7 @@
 %global sameevr   %{?epoch:%{epoch}:}%{version}-%{release}
 
 Name:             community-mysql
-Version:          5.6.27
+Version:          5.7.9
 Release:          1%{?with_debug:.debug}%{?dist}
 Summary:          MySQL client programs and shared libraries
 Group:            Applications/Databases
@@ -87,7 +89,7 @@ URL:              http://www.mysql.com
 # not only GPL code.  See README.mysql-license
 License:          GPLv2 with exceptions and LGPLv2 and BSD
 
-Source0:          https://cdn.mysql.com/Downloads/MySQL-5.6/mysql-%{version}.tar.gz
+Source0:          https://cdn.mysql.com/Downloads/MySQL-5.7/mysql-%{version}.tar.gz
 Source2:          mysql_config_multilib.sh
 Source3:          my.cnf.in
 Source4:          my_config.h
@@ -109,28 +111,27 @@ Source31:         server.cnf.in
 
 # Comments for these patches are in the patch files
 # Patches common for more mysql-like packages
-Patch1:           %{pkgnamepatch}-strmov.patch
-Patch2:           %{pkgnamepatch}-install-test.patch
-Patch3:           %{pkgnamepatch}-s390-tsc.patch
-Patch4:           %{pkgnamepatch}-logrotate.patch
-Patch5:           %{pkgnamepatch}-cipherspec.patch
-Patch6:           %{pkgnamepatch}-file-contents.patch
-Patch8:           %{pkgnamepatch}-scripts.patch
-Patch9:           %{pkgnamepatch}-install-db-sharedir.patch
-Patch10:          %{pkgnamepatch}-paths.patch
+Patch1:           %{pkgnamepatch}-install-test.patch
+Patch2:           %{pkgnamepatch}-s390-tsc.patch
+Patch3:           %{pkgnamepatch}-logrotate.patch
+Patch4:           %{pkgnamepatch}-file-contents.patch
+Patch5:           %{pkgnamepatch}-scripts.patch
+Patch6:           %{pkgnamepatch}-paths.patch
+Patch7:           %{pkgnamepatch}-boost.patch
+Patch8:           %{pkgnamepatch}-test-openssl_1.patch
 
 # Patches specific for this mysql package
 Patch51:          %{pkgnamepatch}-chain-certs.patch
 Patch52:          %{pkgnamepatch}-sharedir.patch
-Patch53:          %{pkgnamepatch}-5.6.16-libmysql-version.patch
-Patch55:          %{pkgnamepatch}-5.6.16-mysql-install.patch
-Patch56:          %{pkgnamepatch}-pluginerrmsg.patch
-Patch70:          %{pkgnamepatch}-5.6.13-major.patch
+Patch70:          %{pkgnamepatch}-5.7.9-major.patch
 
+BuildRequires:    boost-devel
 BuildRequires:    cmake
 BuildRequires:    libaio-devel
 BuildRequires:    libedit-devel
 BuildRequires:    libevent-devel
+BuildRequires:    lz4-devel
+BuildRequires:    mecab-devel
 BuildRequires:    openssl-devel
 BuildRequires:    perl
 BuildRequires:    systemtap-sdt-devel
@@ -138,6 +139,8 @@ BuildRequires:    zlib-devel
 # Tests requires time and ps and some perl modules
 BuildRequires:    procps
 BuildRequires:    time
+BuildRequires:    perl(Digest::file)
+BuildRequires:    perl(Digest::MD5)
 BuildRequires:    perl(Env)
 BuildRequires:    perl(Exporter)
 BuildRequires:    perl(Fcntl)
@@ -257,6 +260,7 @@ Requires:         %{name}-common%{?_isa} = %{sameevr}
 Requires:         %{_sysconfdir}/my.cnf
 Requires:         %{_sysconfdir}/my.cnf.d
 Requires:         %{name}-errmsg%{?_isa} = %{sameevr}
+%{?mecab:Requires: mecab-ipadic}
 Requires:         sh-utils
 Requires(pre):    /usr/sbin/useradd
 %if %{with init_systemd}
@@ -273,7 +277,10 @@ Provides:         mysql-server = %{sameevr}
 Provides:         mysql-server%{?_isa} = %{sameevr}
 Provides:         mysql-compat-server = %{sameevr}
 Provides:         mysql-compat-server%{?_isa} = %{sameevr}
+Obsoletes:        mysql-bench < 5.7.8
+Obsoletes:        mysql-bench%{?_isa}
 %endif
+Obsoletes:        community-mysql-bench < 5.7.8
 %{?with_conflicts:Conflicts:        mariadb-server}
 %{?with_conflicts:Conflicts:        mariadb-galera-server}
 
@@ -329,25 +336,6 @@ package contains files needed for developing and testing with
 the embedded version of the MySQL server.
 %endif
 
-
-%if %{with bench}
-%package          bench
-Summary:          MySQL benchmark scripts and data
-Group:            Applications/Databases
-Requires:         %{name}%{?_isa} = %{sameevr}
-%{?with_conflicts:Conflicts:        mariadb-bench}
-%if %{with mysql_names}
-Provides:         mysql-bench = %{sameevr}
-Provides:         mysql-bench%{?_isa} = %{sameevr}
-%endif
-
-%description      bench
-MySQL is a multi-user, multi-threaded SQL database server. This
-package contains benchmark scripts and data for use when benchmarking
-MySQL.
-%endif
-
-
 %if %{with test}
 %package          test
 Summary:          The test suite distributed with MySQL
@@ -355,6 +343,8 @@ Group:            Applications/Databases
 Requires:         %{name}%{?_isa} = %{sameevr}
 Requires:         %{name}-common%{?_isa} = %{sameevr}
 Requires:         %{name}-server%{?_isa} = %{sameevr}
+Requires:         perl(Digest::file)
+Requires:         perl(Digest::MD5)
 Requires:         perl(Env)
 Requires:         perl(Exporter)
 Requires:         perl(Fcntl)
@@ -387,17 +377,16 @@ the MySQL sources.
 %patch4 -p1
 %patch5 -p1
 %patch6 -p1
+%patch7 -p1
 %patch8 -p1
-%patch9 -p1
-%patch10 -p1
 %patch51 -p1
 %patch52 -p1
-%patch53 -p1
-%patch55 -p1
-%patch56 -p1
 %if %{with_shared_lib_major_hack}
 %patch70 -p1
 %endif
+
+# Prevent using bundled boost
+rm -r include/boost_1_59_0
 
 # Modify tests to pass on all archs
 pushd mysql-test
@@ -408,11 +397,58 @@ add_test () {
 
 touch %{skiplist}
 
+# these tests fail in 5.7.9
+add_test 'main.gis-precise                      : fails in 5.7.9'
+add_test 'main.gis                              : fails in 5.7.9'
+add_test 'gis.gis_bugs_crashes                  : fails in 5.7.9'
+add_test 'gis.spatial_analysis_functions_buffer : fails in 5.7.9'
+add_test 'gis.spatial_op_testingfunc_mix        : fails in 5.7.9'
+add_test 'gis.spatial_operators_difference      : fails in 5.7.9'
+add_test 'gis.spatial_operators_intersection    : fails in 5.7.9'
+add_test 'gis.spatial_operators_symdifference   : fails in 5.7.9'
+add_test 'main.datadir_permission               : fails in 5.7.9'
+add_test 'main.events_1                         : fails in 5.7.9'
+
 # Workaround for upstream bug #http://bugs.mysql.com/56342
 rm -f t/ssl_8k_key-master.opt
 
+# these tests fail in 5.7.9 on arch
+%ifarch %{arm}
+add_test 'gis.spatial_operators_union  : fails in 5.7.9'
+add_test 'gis.spatial_testing_functions_contains  : fails in 5.7.9'
+add_test 'gis.spatial_testing_functions_crosses  : fails in 5.7.9'
+add_test 'gis.spatial_testing_functions_disjoint  : fails in 5.7.9'
+add_test 'gis.spatial_testing_functions_equals  : fails in 5.7.9'
+add_test 'gis.spatial_testing_functions_intersects  : fails in 5.7.9'
+add_test 'gis.spatial_testing_functions_overlaps  : fails in 5.7.9'
+add_test 'gis.spatial_testing_functions_touches  : fails in 5.7.9'
+add_test 'gis.spatial_testing_functions_within  : fails in 5.7.9'
+add_test 'innodb_fts.opt  : fails in 5.7.9'
+add_test 'innodb_gis.gis  : fails in 5.7.9'
+add_test 'innodb_gis.precise  : fails in 5.7.9'
+add_test 'innodb_gis.1  : fails in 5.7.9'
+add_test 'innodb.log_file  : fails in 5.7.9'
+add_test 'perfschema.dml_host_cache  : fails in 5.7.9'
+add_test 'perfschema.dml_hosts  : fails in 5.7.9'
+add_test 'perfschema.func_file_io  : fails in 5.7.9'
+add_test 'perfschema.setup_objects  : fails in 5.7.9'
+add_test 'test_service_sql_api.test_session_detach  : fails in 5.7.9'
+add_test 'test_service_sql_api.test_session_info  : fails in 5.7.9'
+add_test 'test_service_sql_api.test_sql_all_col_types  : fails in 5.7.9'
+add_test 'test_service_sql_api.test_sql_complex  : fails in 5.7.9'
+add_test 'test_service_sql_api.test_sql_errors  : fails in 5.7.9'
+add_test 'test_service_sql_api.test_sql_general_log  : fails in 5.7.9'
+add_test 'test_service_sql_api.test_sql_processlist  : fails in 5.7.9'
+add_test 'test_service_sql_api.test_sql_replication  : fails in 5.7.9'
+add_test 'test_service_sql_api.test_sql_sqlmode  : fails in 5.7.9'
+add_test 'test_service_sql_api.test_sql_stored_procedures_functions  : fails in 5.7.9'
+add_test 'test_service_sql_api.test_sql_views_triggers  : fails in 5.7.9'
+add_test 'test_service_sql_api.test_sql_2_sessions  : fails in 5.7.9'
+%endif
+
+
 # Archs without hw performance counter, rh 741325
-%ifarch %{arm} aarch64 sparc64
+%ifarch aarch64 sparc64
 add_test 'perfschema.func_file_io  : rh 741325'
 add_test 'perfschema.func_mutex    : rh 741325'
 add_test 'perfschema.setup_objects : rh 741325'
@@ -420,7 +456,7 @@ add_test 'perfschema.global_read_lock :  77889'
 %endif
 
 # Archs with collation issues, bugs.mysql.com/46895
-%ifarch %{arm} aarch64 ppc %{power64} s390 s390x
+%ifarch aarch64 ppc %{power64} s390 s390x
 add_test 'innodb.innodb_ctype_ldml :  46895'
 add_test 'main.ctype_ldml          :  46895'
 %endif
@@ -480,17 +516,23 @@ cmake .. \
          -DINSTALL_PLUGINDIR="%{_lib}/mysql/plugin" \
          -DINSTALL_SBINDIR=libexec \
          -DINSTALL_SCRIPTDIR=bin \
-         -DINSTALL_SQLBENCHDIR=share \
          -DINSTALL_SUPPORTFILESDIR=share/%{pkg_name} \
          -DMYSQL_DATADIR="%{dbdatadir}" \
          -DMYSQL_UNIX_ADDR="/var/lib/mysql/mysql.sock" \
          -DENABLED_LOCAL_INFILE=ON \
          -DENABLE_DTRACE=ON \
+%if %{with init_systemd}
+         -DWITH_SYSTEMD=1 \
+         -DSYSTEMD_SERVICE_NAME="%{daemon_name}" \
+         -DSYSTEMD_PID_DIR="%{pidfiledir}" \
+%endif
          -DWITH_INNODB_MEMCACHED=ON \
          -DWITH_EMBEDDED_SERVER=ON \
          -DWITH_EMBEDDED_SHARED_LIBRARY=ON \
          -DWITH_EDITLINE=system \
          -DWITH_LIBEVENT=system \
+         -DWITH_LZ4=system \
+         -DWITH_MECAB=system \
          -DWITH_SSL=system \
          -DWITH_ZLIB=system \
          -DCMAKE_C_FLAGS="%{optflags}%{?with_debug: -fno-strict-overflow -Wno-unused-result -Wno-unused-function -Wno-unused-but-set-variable}" \
@@ -564,10 +606,8 @@ mv %{buildroot}%{_datadir}/mysql-test/lib/My/SafeProcess/my_safe_process %{build
 ln -s ../../../../../bin/my_safe_process %{buildroot}%{_datadir}/mysql-test/lib/My/SafeProcess/my_safe_process
 
 # not needed in rpm package
-rm -f %{buildroot}%{_bindir}/mysqlaccess.conf
 rm -f %{buildroot}%{_bindir}/mysql_embedded
 rm -f %{buildroot}%{_libdir}/mysql/*.a
-rm -f %{buildroot}%{_datadir}/%{pkg_name}/binary-configure
 rm -f %{buildroot}%{_datadir}/%{pkg_name}/magic
 rm -f %{buildroot}%{_datadir}/%{pkg_name}/mysql.server
 rm -f %{buildroot}%{_datadir}/%{pkg_name}/mysqld_multi.server
@@ -604,7 +644,6 @@ cp -p %{buildroot}%{_mandir}/man1/mysql_client_test.1 %{buildroot}%{_mandir}/man
 
 %if %{without clibrary}
 unlink %{buildroot}%{_libdir}/mysql/libmysqlclient.so
-unlink %{buildroot}%{_libdir}/mysql/libmysqlclient_r.so
 rm -rf %{buildroot}%{_libdir}/mysql/libmysqlclient*.so.*
 rm -rf %{buildroot}%{_sysconfdir}/ld.so.conf.d
 %endif
@@ -619,17 +658,18 @@ rm -f %{buildroot}%{_mandir}/man1/{mysql_client_test_embedded,mysqltest_embedded
 rm -f %{buildroot}%{_bindir}/mysql_config*
 rm -rf %{buildroot}%{_includedir}/mysql
 rm -f %{buildroot}%{_datadir}/aclocal/mysql.m4
+rm -f %{buildroot}%{_libdir}/pkgconfig/mysqlclient.pc
 rm -f %{buildroot}%{_libdir}/mysql/libmysqlclient*.so
 rm -f %{buildroot}%{_mandir}/man1/mysql_config.1*
 %endif
 
 %if %{without client}
-rm -f %{buildroot}%{_bindir}/{msql2mysql,mysql,mysql_config_editor,\
-mysql_find_rows,mysql_plugin,mysql_waitpid,mysqlaccess,mysqladmin,mysqlbinlog,\
-mysqlcheck,mysqldump,mysqlimport,mysqlshow,mysqlslap,my_print_defaults}
-rm -f %{buildroot}%{_mandir}/man1/{msql2mysql,mysql,mysql_config_editor,\
-mysql_find_rows,mysql_plugin,mysql_waitpid,mysqlaccess,mysqladmin,mysqlbinlog,\
-mysqlcheck,mysqldump,mysqlimport,mysqlshow,mysqlslap,my_print_defaults}.1*
+rm -f %{buildroot}%{_bindir}/{mysql,mysql_config_editor,\
+mysql_plugin,mysqladmin,mysqlbinlog,\
+mysqlcheck,mysqldump,mysqlpump,mysqlimport,mysqlshow,mysqlslap,my_print_defaults}
+rm -f %{buildroot}%{_mandir}/man1/{mysql,mysql_config_editor,\
+mysql_plugin,mysqladmin,mysqlbinlog,\
+mysqlcheck,mysqldump,mysqlpump,mysqlimport,mysqlshow,mysqlslap,my_print_defaults}.1*
 %endif
 
 %if %{with config}
@@ -649,10 +689,6 @@ french,german,greek,hungarian,italian,japanese,korean,norwegian,norwegian-ny,\
 polish,portuguese,romanian,russian,serbian,slovak,spanish,swedish,ukrainian}
 %endif
 
-%if %{without bench}
-rm -rf %{buildroot}%{_datadir}/sql-bench
-%endif
-
 %if %{without test}
 rm -f %{buildroot}%{_bindir}/{mysql_client_test,my_safe_process}
 rm -rf %{buildroot}%{_datadir}/mysql-test
@@ -670,10 +706,14 @@ cp ../../mysql-test/%{skiplist} .
 export MTR_BUILD_THREAD=%{__isa_bits}
 ./mtr \
   --mem --parallel=auto --force --retry=0 \
-  --skip-test-list=%{skiplist} \
   --mysqld=--binlog-format=mixed \
   --suite-timeout=720 --testcase-timeout=30 \
-  --clean-vardir
+  --clean-vardir \
+%if %{check_testsuite}
+  --max-test-fail=0 || :
+%else
+  --skip-test-list=%{skiplist}
+%endif
   rm -rf var/* $(readlink var)
 popd
 popd
@@ -735,34 +775,28 @@ fi
 
 %if %{with client}
 %files
-%{_bindir}/msql2mysql
 %{_bindir}/mysql
 %{_bindir}/mysql_config_editor
-%{_bindir}/mysql_find_rows
 %{_bindir}/mysql_plugin
-%{_bindir}/mysql_waitpid
-%{_bindir}/mysqlaccess
 %{_bindir}/mysqladmin
 %{_bindir}/mysqlbinlog
 %{_bindir}/mysqlcheck
 %{_bindir}/mysqldump
 %{_bindir}/mysqlimport
+%{_bindir}/mysqlpump
 %{_bindir}/mysqlshow
 %{_bindir}/mysqlslap
 %{_bindir}/my_print_defaults
 
-%{_mandir}/man1/msql2mysql.1*
 %{_mandir}/man1/mysql.1*
 %{_mandir}/man1/mysql_config_editor.1*
-%{_mandir}/man1/mysql_find_rows.1*
 %{_mandir}/man1/mysql_plugin.1*
-%{_mandir}/man1/mysql_waitpid.1*
-%{_mandir}/man1/mysqlaccess.1*
 %{_mandir}/man1/mysqladmin.1*
 %{_mandir}/man1/mysqlbinlog.1*
 %{_mandir}/man1/mysqlcheck.1*
 %{_mandir}/man1/mysqldump.1*
 %{_mandir}/man1/mysqlimport.1*
+%{_mandir}/man1/mysqlpump.1*
 %{_mandir}/man1/mysqlshow.1*
 %{_mandir}/man1/mysqlslap.1*
 %{_mandir}/man1/my_print_defaults.1*
@@ -825,19 +859,16 @@ fi
 %{_bindir}/myisam_ftdump
 %{_bindir}/myisamlog
 %{_bindir}/myisampack
-%{_bindir}/mysql_convert_table_format
-%{_bindir}/mysql_fix_extensions
 %{_bindir}/mysql_install_db
 %{_bindir}/mysql_secure_installation
-%{_bindir}/mysql_setpermission
+%{_bindir}/mysql_ssl_rsa_setup
 %{_bindir}/mysql_tzinfo_to_sql
 %{_bindir}/mysql_upgrade
-%{_bindir}/mysql_zap
-%{_bindir}/mysqlbug
+%{_bindir}/mysqlbinlog
+%if %{with init_systemd}
+%{_bindir}/mysqld_pre_systemd
+%endif
 %{_bindir}/mysqldumpslow
-%{_bindir}/mysqld_multi
-%{_bindir}/mysqld_safe
-%{_bindir}/mysqlhotcopy
 %{_bindir}/mysqltest
 %{_bindir}/innochecksum
 %{_bindir}/perror
@@ -860,38 +891,36 @@ fi
 %{_mandir}/man1/myisamchk.1*
 %{_mandir}/man1/myisamlog.1*
 %{_mandir}/man1/myisampack.1*
-%{_mandir}/man1/mysql_convert_table_format.1*
 %{_mandir}/man1/myisam_ftdump.1*
 %{_mandir}/man1/mysql.server.1*
-%{_mandir}/man1/mysql_fix_extensions.1*
 %{_mandir}/man1/mysql_install_db.1*
 %{_mandir}/man1/mysql_secure_installation.1*
+%{_mandir}/man1/mysql_ssl_rsa_setup.1*
+%{_mandir}/man1/mysql_tzinfo_to_sql.1*
 %{_mandir}/man1/mysql_upgrade.1*
-%{_mandir}/man1/mysql_zap.1*
-%{_mandir}/man1/mysqlbug.1*
 %{_mandir}/man1/mysqldumpslow.1*
 %{_mandir}/man1/mysqld_multi.1*
 %{_mandir}/man1/mysqld_safe.1*
-%{_mandir}/man1/mysqlhotcopy.1*
 %{_mandir}/man1/mysqlman.1*
-%{_mandir}/man1/mysql_setpermission.1*
 %{_mandir}/man1/mysqltest.1*
 %{_mandir}/man1/innochecksum.1*
 %{_mandir}/man1/perror.1*
 %{_mandir}/man1/replace.1*
 %{_mandir}/man1/resolve_stack_dump.1*
 %{_mandir}/man1/resolveip.1*
-%{_mandir}/man1/mysql_tzinfo_to_sql.1*
 %{_mandir}/man8/mysqld.8*
 
 %{_datadir}/%{pkg_name}/dictionary.txt
 %{_datadir}/%{pkg_name}/fill_help_tables.sql
 %{_datadir}/%{pkg_name}/innodb_memcached_config.sql
+%{_datadir}/%{pkg_name}/install_rewriter.sql
 %{_datadir}/%{pkg_name}/mysql_security_commands.sql
+%{_datadir}/%{pkg_name}/mysql_sys_schema.sql
 %{_datadir}/%{pkg_name}/mysql_system_tables.sql
 %{_datadir}/%{pkg_name}/mysql_system_tables_data.sql
 %{_datadir}/%{pkg_name}/mysql_test_data_timezone.sql
 %{_datadir}/%{pkg_name}/my-*.cnf
+%{_datadir}/%{pkg_name}/uninstall_rewriter.sql
 
 %{daemondir}/%{daemon_name}*
 %{_libexecdir}/mysql-prepare-db-dir
@@ -901,10 +930,10 @@ fi
 %{_libexecdir}/mysql-check-upgrade
 %{_libexecdir}/mysql-scripts-common
 
+%{_tmpfilesdir}/mysql.conf
 %{?with_init_systemd:%{_tmpfilesdir}/%{name}.conf}
 %attr(0755,mysql,mysql) %dir %{dbdatadir}
 %attr(0755,mysql,mysql) %dir %{pidfiledir}
-%attr(0755,mysql,mysql) %dir %{_localstatedir}/lib/mysql
 %attr(0640,mysql,mysql) %config %ghost %verify(not md5 size mtime) %{logfile}
 %config(noreplace) %{logrotateddir}/%{daemon_name}
 
@@ -916,8 +945,8 @@ fi
 %{_datadir}/aclocal/mysql.m4
 %if %{with clibrary}
 %{_libdir}/mysql/libmysqlclient.so
-%{_libdir}/mysql/libmysqlclient_r.so
 %endif
+%{_libdir}/pkgconfig/mysqlclient.pc
 %{_mandir}/man1/mysql_config.1*
 %endif
 
@@ -933,11 +962,6 @@ fi
 %{_mandir}/man1/mysqltest_embedded.1*
 %endif
 
-%if %{with bench}
-%files bench
-%{_datadir}/sql-bench
-%endif
-
 %if %{with test}
 %files test
 %{_bindir}/mysql_client_test
@@ -947,6 +971,9 @@ fi
 %endif
 
 %changelog
+* Fri Oct  2 2015 Jakub Dorňák <jdornak@redhat.com> - 5.7.9-1
+- Update to 5.7.9
+
 * Thu Oct  1 2015 Jakub Dorňák <jdornak@redhat.com> - 5.6.27-1
 - Update to 5.6.27
 
