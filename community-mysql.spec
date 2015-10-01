@@ -77,7 +77,7 @@
 %global sameevr   %{?epoch:%{epoch}:}%{version}-%{release}
 
 Name:             community-mysql
-Version:          5.6.26
+Version:          5.6.27
 Release:          1%{?with_debug:.debug}%{?dist}
 Summary:          MySQL client programs and shared libraries
 Group:            Applications/Databases
@@ -145,6 +145,7 @@ BuildRequires:    perl(File::Temp)
 BuildRequires:    perl(Data::Dumper)
 BuildRequires:    perl(Getopt::Long)
 BuildRequires:    perl(IPC::Open3)
+BuildRequires:    perl(Memoize)
 BuildRequires:    perl(Socket)
 BuildRequires:    perl(Sys::Hostname)
 BuildRequires:    perl(Test::More)
@@ -946,6 +947,9 @@ fi
 %endif
 
 %changelog
+* Thu Oct  1 2015 Jakub Dorňák <jdornak@redhat.com> - 5.6.27-1
+- Update to 5.6.27
+
 * Thu Jul 30 2015 Jakub Dorňák <jdornak@redhat.com> - 5.6.26-1
 - Update to 5.6.26
 
