@@ -408,6 +408,11 @@ add_test 'gis.spatial_operators_intersection    : fails in 5.7.9'
 add_test 'gis.spatial_operators_symdifference   : fails in 5.7.9'
 add_test 'main.datadir_permission               : fails in 5.7.9'
 add_test 'main.events_1                         : fails in 5.7.9'
+# these tests fail in 5.7.9 randomly
+add_test 'sysschema.fn_ps_thread_trx_info       : randomly fails in 5.7.9'
+add_test 'test_service_sql_api.test_sql_shutdown : randomly fails in 5.7.9'
+add_test 'main.mysqldump                        : randomly fails in 5.7.9'
+add_test 'perfschema.memory_aggregate_no_a_no_u : randomly fails in 5.7.9'
 
 # Workaround for upstream bug #http://bugs.mysql.com/56342
 rm -f t/ssl_8k_key-master.opt
@@ -444,8 +449,10 @@ add_test 'test_service_sql_api.test_sql_sqlmode  : fails in 5.7.9'
 add_test 'test_service_sql_api.test_sql_stored_procedures_functions  : fails in 5.7.9'
 add_test 'test_service_sql_api.test_sql_views_triggers  : fails in 5.7.9'
 add_test 'test_service_sql_api.test_sql_2_sessions  : fails in 5.7.9'
+# fails sometimes
+add_test 'perfschema.func_mutex                     : fails in 5.7.9'
+add_test 'main.xa_prepared_binlog_off               : fails in 5.7.9'
 %endif
-
 
 # Archs without hw performance counter, rh 741325
 %ifarch aarch64 sparc64
