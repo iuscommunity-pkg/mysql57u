@@ -452,6 +452,7 @@ add_test 'test_service_sql_api.test_sql_2_sessions  : fails in 5.7.9'
 # fails sometimes
 add_test 'perfschema.func_mutex                     : fails in 5.7.9'
 add_test 'main.xa_prepared_binlog_off               : fails in 5.7.9'
+add_test 'perfschema.global_read_lock               : fails in 5.7.9'
 %endif
 
 # Archs without hw performance counter, rh 741325
