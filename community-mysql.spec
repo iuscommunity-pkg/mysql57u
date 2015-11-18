@@ -435,6 +435,8 @@ add_test 'innodb_gis.1  : fails in 5.7.9'
 add_test 'innodb.log_file  : fails in 5.7.9'
 add_test 'perfschema.dml_host_cache  : fails in 5.7.9'
 add_test 'perfschema.dml_hosts  : fails in 5.7.9'
+add_test 'perfschema.dml_file_instances  : fails in 5.7.9'
+add_test 'perfschema.mdl_func  : fails in 5.7.9'
 add_test 'perfschema.func_file_io  : fails in 5.7.9'
 add_test 'perfschema.setup_objects  : fails in 5.7.9'
 add_test 'test_service_sql_api.test_session_detach  : fails in 5.7.9'
@@ -452,6 +454,7 @@ add_test 'test_service_sql_api.test_sql_2_sessions  : fails in 5.7.9'
 # fails sometimes
 add_test 'perfschema.func_mutex                     : fails in 5.7.9'
 add_test 'main.xa_prepared_binlog_off               : fails in 5.7.9'
+add_test 'main.innodb_icp_all                       : fails in 5.7.9'
 add_test 'perfschema.global_read_lock               : fails in 5.7.9'
 %endif
 
