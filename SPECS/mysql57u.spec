@@ -78,6 +78,9 @@
 # Make long macros shorter
 %global sameevr   %{?epoch:%{epoch}:}%{version}-%{release}
 
+# Add "--with mecab" build option to optionally enable mecab full-text parser plugin
+%bcond_with mecab
+
 %global ius_suffix 57u
 
 Name:             %{pkg_name}%{?ius_suffix}
@@ -133,7 +136,9 @@ BuildRequires:    libaio-devel
 BuildRequires:    libedit-devel
 BuildRequires:    libevent-devel
 BuildRequires:    lz4-devel
+%if %{with mecab}
 BuildRequires:    mecab-devel
+%endif
 BuildRequires:    openssl-devel
 BuildRequires:    perl
 BuildRequires:    systemtap-sdt-devel
@@ -589,7 +594,9 @@ cmake .. \
          -DWITH_EDITLINE=system \
          -DWITH_LIBEVENT=system \
          -DWITH_LZ4=system \
+%if %{with mecab}
          -DWITH_MECAB=system \
+%endif
          -DWITH_SSL=system \
          -DWITH_ZLIB=system \
          -DCMAKE_C_FLAGS="%{optflags}%{?with_debug: -fno-strict-overflow -Wno-unused-result -Wno-unused-function -Wno-unused-but-set-variable}" \
@@ -1042,6 +1049,7 @@ fi
 * Wed Dec 02 2015 Carl George <carl.george@rackspace.com> - 5.7.9-1.ius
 - Port to IUS from Fedora
 - Use %%daemon_name for tmpfiles config name so it matches service unit name
+- Disable mecab plugin
 
 * Fri Oct  2 2015 Jakub Dorňák <jdornak@redhat.com> - 5.7.9-1
 - Update to 5.7.9
