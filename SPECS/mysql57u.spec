@@ -641,7 +641,7 @@ install -D -p -m 0644 scripts/my.cnf %{buildroot}%{_sysconfdir}/my.cnf
 # install systemd unit files and scripts for handling server startup
 %if %{with init_systemd}
 install -D -p -m 644 scripts/mysql.service %{buildroot}%{_unitdir}/%{daemon_name}.service
-install -D -p -m 0644 scripts/mysql.tmpfiles.d %{buildroot}%{_tmpfilesdir}/%{name}.conf
+install -D -p -m 0644 scripts/mysql.tmpfiles.d %{buildroot}%{_tmpfilesdir}/%{daemon_name}.conf
 %endif
 
 # install SysV init script
@@ -994,8 +994,7 @@ fi
 %{_libexecdir}/mysql-check-upgrade
 %{_libexecdir}/mysql-scripts-common
 
-%{_tmpfilesdir}/mysql.conf
-%{?with_init_systemd:%{_tmpfilesdir}/%{name}.conf}
+%{?with_init_systemd:%{_tmpfilesdir}/%{daemon_name}.conf}
 %attr(0755,mysql,mysql) %dir %{dbdatadir}
 %attr(0755,mysql,mysql) %dir %{pidfiledir}
 %attr(0640,mysql,mysql) %config %ghost %verify(not md5 size mtime) %{logfile}
@@ -1042,6 +1041,7 @@ fi
 %changelog
 * Wed Dec 02 2015 Carl George <carl.george@rackspace.com> - 5.7.9-1.ius
 - Port to IUS from Fedora
+- Use %%daemon_name for tmpfiles config name so it matches service unit name
 
 * Fri Oct  2 2015 Jakub Dorňák <jdornak@redhat.com> - 5.7.9-1
 - Update to 5.7.9
