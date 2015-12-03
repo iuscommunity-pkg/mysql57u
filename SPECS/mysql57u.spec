@@ -1,5 +1,5 @@
 # Name of the package without any prefixes
-%global pkg_name %{name}
+%global pkg_name mysql
 %global pkgnamepatch community-mysql
 
 # Regression tests may take a long time (many cores recommended), skip them by
@@ -14,8 +14,8 @@
 %global with_shared_lib_major_hack 1
 
 # In f20+ use unversioned docdirs, otherwise the old versioned one
-%global _pkgdocdirname %{pkg_name}%{!?_pkgdocdir:-%{version}}
-%{!?_pkgdocdir: %global _pkgdocdir %{_docdir}/%{pkg_name}-%{version}}
+%global _pkgdocdirname %{name}%{!?_pkgdocdir:-%{version}}
+%{!?_pkgdocdir: %global _pkgdocdir %{_docdir}/%{name}-%{version}}
 
 # Use Full RELRO for all binaries (RHBZ#1092548)
 %global _hardened_build 1
@@ -78,9 +78,11 @@
 # Make long macros shorter
 %global sameevr   %{?epoch:%{epoch}:}%{version}-%{release}
 
-Name:             community-mysql
+%global ius_suffix 57u
+
+Name:             %{pkg_name}%{?ius_suffix}
 Version:          5.7.9
-Release:          1%{?with_debug:.debug}%{?dist}
+Release:          1.ius%{?dist}
 Summary:          MySQL client programs and shared libraries
 Group:            Applications/Databases
 URL:              http://www.mysql.com
@@ -181,6 +183,11 @@ Obsoletes:        mysql-cluster < 5.1.44
 %filter_setup
 %endif
 
+Provides:         %{pkg_name} = %{sameevr}
+Provides:         %{pkg_name}%{?_isa} = %{sameevr}
+Conflicts:        %{pkg_name} < %{sameevr}
+
+
 %description
 MySQL is a multi-user, multi-threaded SQL database server. MySQL is a
 client/server implementation consisting of a server daemon (mysqld)
@@ -197,6 +204,10 @@ Requires:         %{name}-common%{?_isa} = %{sameevr}
 Provides:         mysql-libs = %{sameevr}
 Provides:         mysql-libs%{?_isa} = %{sameevr}
 %endif
+Provides:         %{pkg_name}-libs = %{sameevr}
+Provides:         %{pkg_name}-libs%{?_isa} = %{sameevr}
+Conflicts:        %{pkg_name}-libs < %{sameevr}
+
 
 %description      libs
 The mysql-libs package provides the essential shared libraries for any 
@@ -210,6 +221,11 @@ MySQL server.
 %package          config
 Summary:          The config files required by server and client
 Group:            Applications/Databases
+Provides:         %{pkg_name}-config = %{sameevr}
+Provides:         %{pkg_name}-config%{?_isa} = %{sameevr}
+Conflicts:        %{pkg_name}-config < %{sameevr}
+Conflicts:        %{pkg_name}-libs < %{sameevr}
+
 
 %description      config
 The package provides the config file my.cnf and my.cnf.d directory used by any
@@ -224,6 +240,10 @@ package itself.
 Summary:          The shared files required for MySQL server and client
 Group:            Applications/Databases
 Requires:         %{_sysconfdir}/my.cnf
+Provides:         %{pkg_name}-common = %{sameevr}
+Provides:         %{pkg_name}-common%{?_isa} = %{sameevr}
+Conflicts:        %{pkg_name}-common < %{sameevr}
+
 
 %description      common
 The mysql-common package provides the essential shared files for any
@@ -237,6 +257,10 @@ MySQL package.
 Summary:          The error messages files required by server and embedded
 Group:            Applications/Databases
 Requires:         %{name}-common%{?_isa} = %{sameevr}
+Provides:         %{pkg_name}-errmsg = %{sameevr}
+Provides:         %{pkg_name}-errmsg%{?_isa} = %{sameevr}
+Conflicts:        %{pkg_name}-errmsg < %{sameevr}
+
 
 %description      errmsg
 The package provides error messages files for the MySQL daemon and the
@@ -283,6 +307,10 @@ Obsoletes:        mysql-bench%{?_isa}
 Obsoletes:        community-mysql-bench < 5.7.8
 %{?with_conflicts:Conflicts:        mariadb-server}
 %{?with_conflicts:Conflicts:        mariadb-galera-server}
+Provides:         %{pkg_name}-server = %{sameevr}
+Provides:         %{pkg_name}-server%{?_isa} = %{sameevr}
+Conflicts:        %{pkg_name}-server < %{sameevr}
+
 
 %description      server
 MySQL is a multi-user, multi-threaded SQL database server. MySQL is a
@@ -298,6 +326,10 @@ Group:            Applications/Databases
 %{?with_clibrary:Requires:         %{name}-libs%{?_isa} = %{sameevr}}
 Requires:         openssl-devel%{?_isa}
 %{?with_conflicts:Conflicts:        mariadb-devel}
+Provides:         %{pkg_name}-devel = %{sameevr}
+Provides:         %{pkg_name}-devel%{?_isa} = %{sameevr}
+Conflicts:        %{pkg_name}-devel < %{sameevr}
+
 
 %description      devel
 MySQL is a multi-user, multi-threaded SQL database server. This
@@ -316,6 +348,10 @@ Requires:         %{name}-errmsg%{?_isa} = %{sameevr}
 Provides:         mysql-embedded = %{sameevr}
 Provides:         mysql-embedded%{?_isa} = %{sameevr}
 %endif
+Provides:         %{pkg_name}-embedded = %{sameevr}
+Provides:         %{pkg_name}-embedded%{?_isa} = %{sameevr}
+Conflicts:        %{pkg_name}-embedded < %{sameevr}
+
 
 %description      embedded
 MySQL is a multi-user, multi-threaded SQL database server. This
@@ -329,12 +365,17 @@ Group:            Applications/Databases
 Requires:         %{name}-embedded%{?_isa} = %{sameevr}
 Requires:         %{name}-devel%{?_isa} = %{sameevr}
 %{?with_conflicts:Conflicts:        mariadb-embedded-devel}
+Provides:         %{pkg_name}-embedded-devel = %{sameevr}
+Provides:         %{pkg_name}-embedded-devel%{?_isa} = %{sameevr}
+Conflicts:        %{pkg_name}-embedded-devel < %{sameevr}
+
 
 %description      embedded-devel
 MySQL is a multi-user, multi-threaded SQL database server. This
 package contains files needed for developing and testing with
 the embedded version of the MySQL server.
 %endif
+
 
 %if %{with test}
 %package          test
@@ -361,6 +402,10 @@ Requires:         perl(Time::HiRes)
 Provides:         mysql-test = %{sameevr}
 Provides:         mysql-test%{?_isa} = %{sameevr}
 %endif
+Provides:         %{pkg_name}-test = %{sameevr}
+Provides:         %{pkg_name}-test%{?_isa} = %{sameevr}
+Conflicts:        %{pkg_name}-test < %{sameevr}
+
 
 %description      test
 MySQL is a multi-user, multi-threaded SQL database server. This
@@ -488,6 +533,7 @@ popd
 cp %{SOURCE2} %{SOURCE3} %{SOURCE10} %{SOURCE11} %{SOURCE12} %{SOURCE13} \
    %{SOURCE14} %{SOURCE15} %{SOURCE16} %{SOURCE17} %{SOURCE19} %{SOURCE31} scripts
 
+
 %build
 # fail quickly and obviously if user tries to build as root
 %if %runselftest
@@ -555,6 +601,7 @@ cmake .. \
 make %{?_smp_mflags} VERBOSE=1
 
 popd
+
 
 %install
 pushd build
@@ -784,6 +831,7 @@ if [ $1 -ge 1 ]; then
 fi
 %endif
 
+
 %if %{with client}
 %files
 %{_bindir}/mysql
@@ -813,11 +861,13 @@ fi
 %{_mandir}/man1/my_print_defaults.1*
 %endif
 
+
 %if %{with clibrary}
 %files libs
 %{_libdir}/mysql/libmysqlclient*.so.*
 %config(noreplace) %{_sysconfdir}/ld.so.conf.d/*
 %endif
+
 
 %if %{with config}
 %files config
@@ -827,6 +877,7 @@ fi
 %config(noreplace) %{_sysconfdir}/my.cnf
 %endif
 
+
 %if %{with common}
 %files common
 %doc README COPYING README.mysql-license README.mysql-docs
@@ -835,6 +886,7 @@ fi
 %dir %{_datadir}/%{pkg_name}
 %{_datadir}/%{pkg_name}/charsets
 %endif
+
 
 %if %{with errmsg}
 %files errmsg
@@ -864,6 +916,7 @@ fi
 %lang(sv) %{_datadir}/%{pkg_name}/swedish
 %lang(uk) %{_datadir}/%{pkg_name}/ukrainian
 %endif
+
 
 %files server
 %{_bindir}/myisamchk
@@ -948,6 +1001,7 @@ fi
 %attr(0640,mysql,mysql) %config %ghost %verify(not md5 size mtime) %{logfile}
 %config(noreplace) %{logrotateddir}/%{daemon_name}
 
+
 %if %{with devel}
 %files devel
 %{_bindir}/mysql_config
@@ -961,9 +1015,11 @@ fi
 %{_mandir}/man1/mysql_config.1*
 %endif
 
+
 %if %{with embedded}
 %files embedded
 %{_libdir}/mysql/libmysqld.so.*
+
 
 %files embedded-devel
 %{_libdir}/mysql/libmysqld.so
@@ -973,6 +1029,7 @@ fi
 %{_mandir}/man1/mysqltest_embedded.1*
 %endif
 
+
 %if %{with test}
 %files test
 %{_bindir}/mysql_client_test
@@ -981,7 +1038,11 @@ fi
 %{_mandir}/man1/mysql_client_test.1*
 %endif
 
+
 %changelog
+* Wed Dec 02 2015 Carl George <carl.george@rackspace.com> - 5.7.9-1.ius
+- Port to IUS from Fedora
+
 * Fri Oct  2 2015 Jakub Dorňák <jdornak@redhat.com> - 5.7.9-1
 - Update to 5.7.9
 
