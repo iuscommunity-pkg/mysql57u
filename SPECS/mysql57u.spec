@@ -957,6 +957,8 @@ fi
 %{_bindir}/mysqld_pre_systemd
 %endif
 %{_bindir}/mysqldumpslow
+%{_bindir}/mysqld_multi
+%{_bindir}/mysqld_safe
 %{_bindir}/mysqltest
 %{_bindir}/innochecksum
 %{_bindir}/perror
@@ -1068,6 +1070,7 @@ fi
 - Use %%daemon_name for tmpfiles config name so it matches service unit name
 - Disable mecab plugin
 - Use statically linked boost library
+- Restore ownership of mysqld_multi and mysqld_safe commands by the server subpackage
 
 * Fri Oct  2 2015 Jakub Dorňák <jdornak@redhat.com> - 5.7.9-1
 - Update to 5.7.9
