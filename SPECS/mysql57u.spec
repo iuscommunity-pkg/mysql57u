@@ -81,6 +81,9 @@
 # Add "--with mecab" build option to optionally enable mecab full-text parser plugin
 %bcond_with mecab
 
+# Add "--with system_boost" build option to optionally use the system boost library
+%bcond_with system_boost
+
 %global ius_suffix 57u
 
 Name:             %{pkg_name}%{?ius_suffix}
@@ -95,6 +98,7 @@ URL:              http://www.mysql.com
 License:          GPLv2 with exceptions and LGPLv2 and BSD
 
 Source0:          https://cdn.mysql.com/Downloads/MySQL-5.7/mysql-%{version}.tar.gz
+Source1:          http://downloads.sourceforge.net/boost/boost_1_59_0.tar.bz2
 Source2:          mysql_config_multilib.sh
 Source3:          my.cnf.in
 Source4:          my_config.h
@@ -130,7 +134,9 @@ Patch51:          %{pkgnamepatch}-chain-certs.patch
 Patch52:          %{pkgnamepatch}-sharedir.patch
 Patch70:          %{pkgnamepatch}-5.7.9-major.patch
 
+%if %{with system_boost}
 BuildRequires:    boost-devel
+%endif
 BuildRequires:    cmake
 BuildRequires:    libaio-devel
 BuildRequires:    libedit-devel
@@ -420,14 +426,20 @@ the MySQL sources.
 
 
 %prep
+%if %{with system_boost}
 %setup -q -n mysql-%{version}
+%else
+%setup -q -n mysql-%{version} -a 1
+%endif
 %patch1 -p1
 %patch2 -p1
 %patch3 -p1
 %patch4 -p1
 %patch5 -p1
 %patch6 -p1
+%if %{with system_boost}
 %patch7 -p1
+%endif
 %patch8 -p1
 %patch51 -p1
 %patch52 -p1
@@ -435,8 +447,10 @@ the MySQL sources.
 %patch70 -p1
 %endif
 
+%if %{with system_boost}
 # Prevent using bundled boost
 rm -r include/boost_1_59_0
+%endif
 
 # Modify tests to pass on all archs
 pushd mysql-test
@@ -591,6 +605,9 @@ cmake .. \
          -DWITH_INNODB_MEMCACHED=ON \
          -DWITH_EMBEDDED_SERVER=ON \
          -DWITH_EMBEDDED_SHARED_LIBRARY=ON \
+%if %{without system_boost}
+         -DWITH_BOOST=.. \
+%endif
          -DWITH_EDITLINE=system \
          -DWITH_LIBEVENT=system \
          -DWITH_LZ4=system \
@@ -1050,6 +1067,7 @@ fi
 - Port to IUS from Fedora
 - Use %%daemon_name for tmpfiles config name so it matches service unit name
 - Disable mecab plugin
+- Use statically linked boost library
 
 * Fri Oct  2 2015 Jakub Dorňák <jdornak@redhat.com> - 5.7.9-1
 - Update to 5.7.9
