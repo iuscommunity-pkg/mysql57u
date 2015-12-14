@@ -172,6 +172,7 @@ Requires:         bash
 Requires:         fileutils
 Requires:         grep
 Requires:         %{name}-common%{?_isa} = %{sameevr}
+Requires:         mysqlclient16
 
 %if %{with mysql_names}
 Provides:         mysql = %{sameevr}
