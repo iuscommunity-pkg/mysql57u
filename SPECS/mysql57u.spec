@@ -38,7 +38,7 @@
 # When there is already another package that ships /etc/my.cnf,
 # rather include it than ship the file again, since conflicts between
 # those files may create issues
-%bcond_with config
+%bcond_without config
 
 # For deep debugging we need to build binaries with extra debug info
 %bcond_with debug
@@ -88,7 +88,7 @@
 
 Name:             %{pkg_name}%{?ius_suffix}
 Version:          5.7.9
-Release:          1.ius%{?dist}
+Release:          2.ius%{?dist}
 Summary:          MySQL client programs and shared libraries
 Group:            Applications/Databases
 URL:              http://www.mysql.com
@@ -1070,6 +1070,9 @@ fi
 
 
 %changelog
+* Tue Jan 05 2016 Ben Harper <ben.harper@rackspace.com> - 5.7.9-2.ius
+- enable config subpackage
+
 * Wed Dec 02 2015 Carl George <carl.george@rackspace.com> - 5.7.9-1.ius
 - Port to IUS from Fedora
 - Use %%daemon_name for tmpfiles config name so it matches service unit name
