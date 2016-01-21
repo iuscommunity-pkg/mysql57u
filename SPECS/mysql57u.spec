@@ -87,8 +87,8 @@
 %global ius_suffix 57u
 
 Name:             %{pkg_name}%{?ius_suffix}
-Version:          5.7.9
-Release:          2.ius%{?dist}
+Version:          5.7.10
+Release:          1.ius%{?dist}
 Summary:          MySQL client programs and shared libraries
 Group:            Applications/Databases
 URL:              http://www.mysql.com
@@ -127,7 +127,6 @@ Patch4:           %{pkgnamepatch}-file-contents.patch
 Patch5:           %{pkgnamepatch}-scripts.patch
 Patch6:           %{pkgnamepatch}-paths.patch
 Patch7:           %{pkgnamepatch}-boost.patch
-Patch8:           %{pkgnamepatch}-test-openssl_1.patch
 
 # Patches specific for this mysql package
 Patch51:          %{pkgnamepatch}-chain-certs.patch
@@ -441,7 +440,6 @@ the MySQL sources.
 %if %{with system_boost}
 %patch7 -p1
 %endif
-%patch8 -p1
 %patch51 -p1
 %patch52 -p1
 %if %{with_shared_lib_major_hack}
@@ -1070,6 +1068,11 @@ fi
 
 
 %changelog
+* Thu Jan 21 2016 Ben Harper <ben.harper@rackspace.com> - 5.7.10-1.ius
+- Update to 5.7.10
+- removed Patch8, fixed upstream
+- updated Patch70
+
 * Tue Jan 05 2016 Ben Harper <ben.harper@rackspace.com> - 5.7.9-2.ius
 - enable config subpackage
 

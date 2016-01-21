@@ -1,11 +1,13 @@
---- mysql-5.7.8/cmake/mysql_version.cmake.orig	2015-09-23 15:43:23.252558904 +0200
-+++ mysql-5.7.8/cmake/mysql_version.cmake	2015-09-23 15:42:58.187604141 +0200
-@@ -17,7 +17,7 @@
+--- mysql-5.7.10/cmake/mysql_version.cmake	2015-11-29 19:16:24.000000000 +0000
++++ mysql-5.7.10/cmake/mysql_version.cmake.org	2016-01-21 15:53:48.155000000 +0000
+@@ -17,8 +17,8 @@
  # Global constants, only to be changed between major releases.
  #
  
 -SET(SHARED_LIB_MAJOR_VERSION "20")
+-SET(SHARED_LIB_MINOR_VERSION "1")
 +SET(SHARED_LIB_MAJOR_VERSION "1020")
- SET(SHARED_LIB_MINOR_VERSION "0")
++SET(SHARED_LIB_MINOR_VERSION "0")
  SET(PROTOCOL_VERSION "10")
  SET(DOT_FRM_VERSION "6")
+ 
