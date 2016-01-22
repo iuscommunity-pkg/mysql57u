@@ -968,6 +968,9 @@ fi
 %{_bindir}/replace
 %{_bindir}/resolve_stack_dump
 %{_bindir}/resolveip
+%{_bindir}/lz4_decompress
+%{_bindir}/zlib_decompress
+
 
 %config(noreplace) %{_sysconfdir}/my.cnf.d/%{pkg_name}-server.cnf
 
@@ -1001,6 +1004,8 @@ fi
 %{_mandir}/man1/replace.1*
 %{_mandir}/man1/resolve_stack_dump.1*
 %{_mandir}/man1/resolveip.1*
+%{_mandir}/man1/lz4_decompress.1*
+%{_mandir}/man1/zlib_decompress.1*
 %{_mandir}/man8/mysqld.8*
 
 %{_datadir}/%{pkg_name}/dictionary.txt
