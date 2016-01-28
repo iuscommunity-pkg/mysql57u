@@ -88,7 +88,7 @@
 
 Name:             %{pkg_name}%{?ius_suffix}
 Version:          5.7.10
-Release:          1.ius%{?dist}
+Release:          2.ius%{?dist}
 Summary:          MySQL client programs and shared libraries
 Group:            Applications/Databases
 URL:              http://www.mysql.com
@@ -304,9 +304,6 @@ Requires:         systemd
 # Make sure it's there when scriptlets run, too
 %{?systemd_requires: %systemd_requires}
 %endif
-# mysqlhotcopy needs DBI/DBD support
-Requires:         perl(DBI)
-Requires:         perl(DBD::mysql)
 %if %{with mysql_names}
 Provides:         mysql-server = %{sameevr}
 Provides:         mysql-server%{?_isa} = %{sameevr}
@@ -660,6 +657,7 @@ touch %{buildroot}%{logfile}
 
 mkdir -p %{buildroot}%{pidfiledir}
 install -p -m 0755 -d %{buildroot}%{dbdatadir}
+install -p -m 0750 -d %{buildroot}%{_localstatedir}/lib/mysql-files
 
 %if %{with config}
 install -D -p -m 0644 scripts/my.cnf %{buildroot}%{_sysconfdir}/my.cnf
@@ -1030,6 +1028,7 @@ fi
 
 %{?with_init_systemd:%{_tmpfilesdir}/%{daemon_name}.conf}
 %attr(0755,mysql,mysql) %dir %{dbdatadir}
+%attr(0750,mysql,mysql) %dir %{_localstatedir}/lib/mysql-files
 %attr(0755,mysql,mysql) %dir %{pidfiledir}
 %attr(0640,mysql,mysql) %config %ghost %verify(not md5 size mtime) %{logfile}
 %config(noreplace) %{logrotateddir}/%{daemon_name}
@@ -1073,6 +1072,15 @@ fi
 
 
 %changelog
+* Thu Jan 28 2016 Ben Harper <ben.harper@rackspace.com> - 5.7.10-2.ius
+- Changes from Fedora http://pkgs.fedoraproject.org/cgit/rpms/community-mysql.git/commit/?id=1d9080ea5c4865e4e41a88a65024c0943b657ede
+  Use mysqld instead of mysqld_safe (mysqld_safe not necessary for 5.7)
+  Use mysqld --initialize-insecure instead of mysql_install_db
+  Create /var/lib/mysql-files (used by secure-file-priv)
+    http://dev.mysql.com/doc/refman/5.7/en/server-system-variables.html#sysvar_secure_file_priv
+  Remove unnecessary Perl dependencies (mysqlhotcopy was removed in 5.7
+  Thanks Norvald H. Ryeng
+
 * Thu Jan 21 2016 Ben Harper <ben.harper@rackspace.com> - 5.7.10-1.ius
 - Update to 5.7.10
 - removed Patch8, fixed upstream

@@ -28,7 +28,7 @@ After=syslog.target
 After=network.target
 
 [Service]
-Type=simple
+Type=forking
 User=mysql
 Group=mysql
 
@@ -39,7 +39,7 @@ ExecStartPre=@libexecdir@/mysql-check-socket
 ExecStartPre=@libexecdir@/mysql-prepare-db-dir %n
 # Note: we set --basedir to prevent probes that might trigger SELinux alarms,
 # per bug #547485
-ExecStart=@bindir@/mysqld_safe --basedir=@prefix@
+ExecStart=@libexecdir@/mysqld --daemonize --basedir=@prefix@
 ExecStartPost=@libexecdir@/mysql-wait-ready $MAINPID
 ExecStartPost=@libexecdir@/mysql-check-upgrade
 ExecStopPost=@libexecdir@/mysql-wait-stop
