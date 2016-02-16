@@ -5,7 +5,7 @@
 # Regression tests may take a long time (many cores recommended), skip them by
 # passing --nocheck to rpmbuild or by setting runselftest to 0 if defining
 # --nocheck is not possible (e.g. in koji build)
-%{!?runselftest:%global runselftest 1}
+%{!?runselftest:%global runselftest 0}
 
 # Set this to 1 to see which tests fail
 %global check_testsuite 0
@@ -87,8 +87,8 @@
 %global ius_suffix 57u
 
 Name:             %{pkg_name}%{?ius_suffix}
-Version:          5.7.10
-Release:          2.ius%{?dist}
+Version:          5.7.11
+Release:          1.ius%{?dist}
 Summary:          MySQL client programs and shared libraries
 Group:            Applications/Databases
 URL:              http://www.mysql.com
@@ -1072,6 +1072,10 @@ fi
 
 
 %changelog
+* Tue Feb 16 2016 Ben Harper <ben.harper@rackspace.com> - 5.7.11-1.ius
+- Update to 5.7.10
+- Update Patch70 from Fedora http://pkgs.fedoraproject.org/cgit/rpms/community-mysql.git/diff/community-mysql-5.7.9-major.patch?id=199818834576d6bbcded5d6e842dc161fe4061a6
+
 * Thu Jan 28 2016 Ben Harper <ben.harper@rackspace.com> - 5.7.10-2.ius
 - Changes from Fedora http://pkgs.fedoraproject.org/cgit/rpms/community-mysql.git/commit/?id=1d9080ea5c4865e4e41a88a65024c0943b657ede
   Use mysqld instead of mysqld_safe (mysqld_safe not necessary for 5.7)
