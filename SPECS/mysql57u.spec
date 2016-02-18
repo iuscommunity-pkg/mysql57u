@@ -1073,7 +1073,7 @@ fi
 
 %changelog
 * Tue Feb 16 2016 Ben Harper <ben.harper@rackspace.com> - 5.7.11-1.ius
-- Update to 5.7.10
+- Update to 5.7.11
 - Update Patch70 from Fedora http://pkgs.fedoraproject.org/cgit/rpms/community-mysql.git/diff/community-mysql-5.7.9-major.patch?id=199818834576d6bbcded5d6e842dc161fe4061a6
 
 * Thu Jan 28 2016 Ben Harper <ben.harper@rackspace.com> - 5.7.10-2.ius
