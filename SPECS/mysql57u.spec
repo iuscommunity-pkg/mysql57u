@@ -5,7 +5,7 @@
 # Regression tests may take a long time (many cores recommended), skip them by
 # passing --nocheck to rpmbuild or by setting runselftest to 0 if defining
 # --nocheck is not possible (e.g. in koji build)
-%{!?runselftest:%global runselftest 0}
+%{!?runselftest:%global runselftest 1}
 
 # Set this to 1 to see which tests fail
 %global check_testsuite 0
@@ -87,7 +87,7 @@
 %global ius_suffix 57u
 
 Name:             %{pkg_name}%{?ius_suffix}
-Version:          5.7.11
+Version:          5.7.12
 Release:          1.ius%{?dist}
 Summary:          MySQL client programs and shared libraries
 Group:            Applications/Databases
@@ -1072,6 +1072,9 @@ fi
 
 
 %changelog
+* Mon Apr 11 2016 Ben Harper <ben.harper@rackspace.com> - 5.7.12-1.ius
+- Update to 5.7.12
+
 * Tue Feb 16 2016 Ben Harper <ben.harper@rackspace.com> - 5.7.11-1.ius
 - Update to 5.7.11
 - Update Patch70 from Fedora http://pkgs.fedoraproject.org/cgit/rpms/community-mysql.git/diff/community-mysql-5.7.9-major.patch?id=199818834576d6bbcded5d6e842dc161fe4061a6
