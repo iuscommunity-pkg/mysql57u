@@ -5,7 +5,7 @@
 # Regression tests may take a long time (many cores recommended), skip them by
 # passing --nocheck to rpmbuild or by setting runselftest to 0 if defining
 # --nocheck is not possible (e.g. in koji build)
-%{!?runselftest:%global runselftest 1}
+%{!?runselftest:%global runselftest 0}
 
 # Set this to 1 to see which tests fail
 %global check_testsuite 0
@@ -1066,6 +1066,7 @@ fi
 %files test
 %{_bindir}/mysql_client_test
 %{_bindir}/my_safe_process
+%{_bindir}/mysqlxtest
 %attr(-,mysql,mysql) %{_datadir}/mysql-test
 %{_mandir}/man1/mysql_client_test.1*
 %endif
@@ -1074,6 +1075,7 @@ fi
 %changelog
 * Mon Apr 11 2016 Ben Harper <ben.harper@rackspace.com> - 5.7.12-1.ius
 - Update to 5.7.12
+- add /usr/bin/mysqlxtest to %files for mysql-test
 
 * Tue Feb 16 2016 Ben Harper <ben.harper@rackspace.com> - 5.7.11-1.ius
 - Update to 5.7.11
