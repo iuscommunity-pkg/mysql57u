@@ -1,0 +1,12 @@
+diff -Naurp a/cmake/mysql_version.cmake b/cmake/mysql_version.cmake
+--- a/cmake/mysql_version.cmake	2016-05-25 00:50:36.000000000 -0500
++++ b/cmake/mysql_version.cmake	2016-06-03 09:36:53.513107196 -0500
+@@ -17,7 +17,7 @@
+ # Global constants, only to be changed between major releases.
+ #
+ 
+-SET(SHARED_LIB_MAJOR_VERSION "20")
++SET(SHARED_LIB_MAJOR_VERSION "1020")
+ SET(SHARED_LIB_MINOR_VERSION "3")
+ SET(PROTOCOL_VERSION "10")
+ SET(DOT_FRM_VERSION "6")

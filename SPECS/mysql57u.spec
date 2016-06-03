@@ -131,7 +131,7 @@ Patch7:           %{pkgnamepatch}-boost.patch
 # Patches specific for this mysql package
 Patch51:          %{pkgnamepatch}-chain-certs.patch
 Patch52:          %{pkgnamepatch}-sharedir.patch
-Patch70:          %{pkgnamepatch}-5.7.9-major.patch
+Patch70:          %{pkgnamepatch}-5.7.13-major.patch
 
 %if %{with system_boost}
 BuildRequires:    boost-devel
@@ -1075,6 +1075,7 @@ fi
 %changelog
 * Fri Jun 03 2016 Carl George <carl.george@rackspace.com> - 5.7.13-1.ius
 - Latest upstream
+- Rebase Patch70
 
 * Mon Apr 11 2016 Ben Harper <ben.harper@rackspace.com> - 5.7.12-1.ius
 - Update to 5.7.12
