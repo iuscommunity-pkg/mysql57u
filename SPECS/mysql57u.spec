@@ -87,7 +87,7 @@
 %global ius_suffix 57u
 
 Name:             %{pkg_name}%{?ius_suffix}
-Version:          5.7.12
+Version:          5.7.13
 Release:          1.ius%{?dist}
 Summary:          MySQL client programs and shared libraries
 Group:            Applications/Databases
@@ -1073,6 +1073,9 @@ fi
 
 
 %changelog
+* Fri Jun 03 2016 Carl George <carl.george@rackspace.com> - 5.7.13-1.ius
+- Latest upstream
+
 * Mon Apr 11 2016 Ben Harper <ben.harper@rackspace.com> - 5.7.12-1.ius
 - Update to 5.7.12
 - add /usr/bin/mysqlxtest to %files for mysql-test
