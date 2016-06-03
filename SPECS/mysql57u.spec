@@ -81,9 +81,6 @@
 # Add "--with mecab" build option to optionally enable mecab full-text parser plugin
 %bcond_with mecab
 
-# Add "--with system_boost" build option to optionally use the system boost library
-%bcond_with system_boost
-
 %global ius_suffix 57u
 
 Name:             %{pkg_name}%{?ius_suffix}
@@ -97,8 +94,7 @@ URL:              http://www.mysql.com
 # not only GPL code.  See README.mysql-license
 License:          GPLv2 with exceptions and LGPLv2 and BSD
 
-Source0:          https://cdn.mysql.com/Downloads/MySQL-5.7/mysql-%{version}.tar.gz
-Source1:          http://downloads.sourceforge.net/boost/boost_1_59_0.tar.bz2
+Source0:          https://cdn.mysql.com/Downloads/MySQL-5.7/mysql-boost-%{version}.tar.gz
 Source2:          mysql_config_multilib.sh
 Source3:          my.cnf.in
 Source4:          my_config.h
@@ -126,16 +122,21 @@ Patch3:           %{pkgnamepatch}-logrotate.patch
 Patch4:           %{pkgnamepatch}-file-contents.patch
 Patch5:           %{pkgnamepatch}-scripts.patch
 Patch6:           %{pkgnamepatch}-paths.patch
-Patch7:           %{pkgnamepatch}-boost.patch
 
 # Patches specific for this mysql package
 Patch51:          %{pkgnamepatch}-chain-certs.patch
 Patch52:          %{pkgnamepatch}-sharedir.patch
 Patch70:          %{pkgnamepatch}-5.7.13-major.patch
 
-%if %{with system_boost}
-BuildRequires:    boost-devel
-%endif
+# Patches taken from boost 1.59
+Patch115: boost-1.58.0-pool.patch
+Patch125: boost-1.57.0-mpl-print.patch
+Patch136: boost-1.57.0-spirit-unused_typedef.patch
+Patch145: boost-1.54.0-locale-unused_typedef.patch
+Patch170: boost-1.59.0-log.patch
+Patch180: boost-1.59-python-make_setter.patch
+Patch181: boost-1.59-test-fenv.patch
+
 BuildRequires:    cmake
 BuildRequires:    libaio-devel
 BuildRequires:    libedit-devel
@@ -423,30 +424,29 @@ the MySQL sources.
 
 
 %prep
-%if %{with system_boost}
 %setup -q -n mysql-%{version}
-%else
-%setup -q -n mysql-%{version} -a 1
-%endif
 %patch1 -p1
 %patch2 -p1
 %patch3 -p1
 %patch4 -p1
 %patch5 -p1
 %patch6 -p1
-%if %{with system_boost}
-%patch7 -p1
-%endif
 %patch51 -p1
 %patch52 -p1
 %if %{with_shared_lib_major_hack}
 %patch70 -p1
 %endif
 
-%if %{with system_boost}
-# Prevent using bundled boost
-rm -r include/boost_1_59_0
-%endif
+# Patch Boost
+pushd boost/boost_1_59_0
+%patch115 -p0
+%patch125 -p1
+%patch136 -p1
+%patch145 -p1
+%patch170 -p2
+%patch180 -p2
+%patch181 -p2
+popd
 
 # Modify tests to pass on all archs
 pushd mysql-test
@@ -605,9 +605,6 @@ cmake .. \
          -DWITH_INNODB_MEMCACHED=ON \
          -DWITH_EMBEDDED_SERVER=ON \
          -DWITH_EMBEDDED_SHARED_LIBRARY=ON \
-%if %{without system_boost}
-         -DWITH_BOOST=.. \
-%endif
          -DWITH_EDITLINE=system \
          -DWITH_LIBEVENT=system \
          -DWITH_LZ4=system \
@@ -616,6 +613,7 @@ cmake .. \
 %endif
          -DWITH_SSL=system \
          -DWITH_ZLIB=system \
+         -DWITH_BOOST=../boost/boost_1_59_0 \
          -DCMAKE_C_FLAGS="%{optflags}%{?with_debug: -fno-strict-overflow -Wno-unused-result -Wno-unused-function -Wno-unused-but-set-variable}" \
          -DCMAKE_CXX_FLAGS="%{optflags}%{?with_debug: -fno-strict-overflow -Wno-unused-result -Wno-unused-function -Wno-unused-but-set-variable}" \
 %{?with_debug: -DWITH_DEBUG=1}\
@@ -1076,6 +1074,7 @@ fi
 * Fri Jun 03 2016 Carl George <carl.george@rackspace.com> - 5.7.13-1.ius
 - Latest upstream
 - Rebase Patch70
+- Removing tarball with boost and using mysql tarball with boost bundled (Fedora)
 
 * Mon Apr 11 2016 Ben Harper <ben.harper@rackspace.com> - 5.7.12-1.ius
 - Update to 5.7.12
