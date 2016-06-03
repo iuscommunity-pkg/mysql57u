@@ -137,6 +137,8 @@ Patch170: boost-1.59.0-log.patch
 Patch180: boost-1.59-python-make_setter.patch
 Patch181: boost-1.59-test-fenv.patch
 
+Patch300: ctest-skips.patch
+
 BuildRequires:    cmake
 BuildRequires:    libaio-devel
 BuildRequires:    libedit-devel
@@ -447,6 +449,8 @@ pushd boost/boost_1_59_0
 %patch180 -p2
 %patch181 -p2
 popd
+
+%patch300 -p1
 
 # Modify tests to pass on all archs
 pushd mysql-test
@@ -1078,6 +1082,7 @@ fi
 - Rebase Patch70
 - Removing tarball with boost and using mysql tarball with boost bundled (Fedora)
 - Only use use the mysql-wait-ready script when with init_sysv (Fedora)
+- Add Patch300 to skip pfs_instr-oom
 
 * Mon Apr 11 2016 Ben Harper <ben.harper@rackspace.com> - 5.7.12-1.ius
 - Update to 5.7.12
