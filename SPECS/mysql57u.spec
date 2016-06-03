@@ -670,11 +670,11 @@ install -D -p -m 0644 scripts/mysql.tmpfiles.d %{buildroot}%{_tmpfilesdir}/%{dae
 # install SysV init script
 %if %{with init_sysv}
 install -D -p -m 755 scripts/mysql.init %{buildroot}%{daemondir}/%{daemon_name}
+install -p -m 755 scripts/mysql-wait-ready %{buildroot}%{_libexecdir}/mysql-wait-ready
 %endif
 
 # helper scripts for service starting
 install -p -m 755 scripts/mysql-prepare-db-dir %{buildroot}%{_libexecdir}/mysql-prepare-db-dir
-install -p -m 755 scripts/mysql-wait-ready %{buildroot}%{_libexecdir}/mysql-wait-ready
 install -p -m 755 scripts/mysql-wait-stop %{buildroot}%{_libexecdir}/mysql-wait-stop
 install -p -m 755 scripts/mysql-check-socket %{buildroot}%{_libexecdir}/mysql-check-socket
 install -p -m 755 scripts/mysql-check-upgrade %{buildroot}%{_libexecdir}/mysql-check-upgrade
@@ -1018,7 +1018,9 @@ fi
 
 %{daemondir}/%{daemon_name}*
 %{_libexecdir}/mysql-prepare-db-dir
+%if %{with init_sysv}
 %{_libexecdir}/mysql-wait-ready
+%endif
 %{_libexecdir}/mysql-wait-stop
 %{_libexecdir}/mysql-check-socket
 %{_libexecdir}/mysql-check-upgrade
@@ -1075,6 +1077,7 @@ fi
 - Latest upstream
 - Rebase Patch70
 - Removing tarball with boost and using mysql tarball with boost bundled (Fedora)
+- Only use use the mysql-wait-ready script when with init_sysv (Fedora)
 
 * Mon Apr 11 2016 Ben Harper <ben.harper@rackspace.com> - 5.7.12-1.ius
 - Update to 5.7.12
