@@ -482,6 +482,11 @@ add_test 'perfschema.memory_aggregate_no_a_no_u : randomly fails in 5.7.9'
 add_test 'binlog.binlog_xa_prepared_disconnect : fails in 5.7.9'
 add_test 'main.grant_user_lock : fails in 5.7.9'
 
+# fails in 32bit builds on monkeyfarm
+%ifarch %{ix86}
+add_test 'xplugin.largedata                    : fails in 5.7.13 (32bit only)'
+%endif
+
 # Workaround for upstream bug #http://bugs.mysql.com/56342
 rm -f t/ssl_8k_key-master.opt
 
@@ -1083,6 +1088,7 @@ fi
 - Removing tarball with boost and using mysql tarball with boost bundled (Fedora)
 - Only use use the mysql-wait-ready script when with init_sysv (Fedora)
 - Add Patch300 to skip pfs_instr-oom
+- Skip xplugin.largedata on 32bit
 
 * Mon Apr 11 2016 Ben Harper <ben.harper@rackspace.com> - 5.7.12-1.ius
 - Update to 5.7.12
