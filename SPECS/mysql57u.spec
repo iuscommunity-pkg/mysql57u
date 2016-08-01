@@ -84,7 +84,7 @@
 %global ius_suffix 57u
 
 Name:             %{pkg_name}%{?ius_suffix}
-Version:          5.7.13
+Version:          5.7.14
 Release:          1.ius%{?dist}
 Summary:          MySQL client programs and shared libraries
 Group:            Applications/Databases
@@ -97,7 +97,6 @@ License:          GPLv2 with exceptions and LGPLv2 and BSD
 Source0:          https://cdn.mysql.com/Downloads/MySQL-5.7/mysql-boost-%{version}.tar.gz
 Source2:          mysql_config_multilib.sh
 Source3:          my.cnf.in
-Source4:          my_config.h
 Source6:          README.mysql-docs
 Source7:          README.mysql-license
 Source10:         mysql.tmpfiles.d.in
@@ -151,6 +150,7 @@ BuildRequires:    openssl-devel
 BuildRequires:    perl
 BuildRequires:    systemtap-sdt-devel
 BuildRequires:    zlib-devel
+BuildRequires:    multilib-rpm-config
 # Tests requires time and ps and some perl modules
 BuildRequires:    procps
 BuildRequires:    time
@@ -616,7 +616,7 @@ cmake .. \
          -DWITH_EMBEDDED_SHARED_LIBRARY=ON \
          -DWITH_EDITLINE=system \
          -DWITH_LIBEVENT=system \
-         -DWITH_LZ4=system \
+         -DWITH_LZ4=bundled \
 %if %{with mecab}
          -DWITH_MECAB=system \
 %endif
@@ -639,20 +639,14 @@ pushd build
 make DESTDIR=%{buildroot} install
 
 # multilib header support
+%multilib_fix_c_header --file %{_includedir}/mysql/my_config.h
+
+# multilib support for shell scripts
 # we only apply this to known Red Hat multilib arches, per bug #181335
-unamei=$(uname -i)
-%ifarch %{arm}
-unamei=arm
-%endif
-%ifarch %{power64}
-unamei=ppc64
-%endif
-%ifarch %{arm} aarch64 %{ix86} x86_64 ppc %{power64} %{sparc} s390 s390x
-mv %{buildroot}%{_includedir}/mysql/my_config.h %{buildroot}%{_includedir}/mysql/my_config_${unamei}.h
-install -p -m 644 %{SOURCE4} %{buildroot}%{_includedir}/mysql/
+if %multilib_capable; then
 mv %{buildroot}%{_bindir}/mysql_config %{buildroot}%{_bindir}/mysql_config-%{__isa_bits}
 install -p -m 0755 scripts/mysql_config_multilib %{buildroot}%{_bindir}/mysql_config
-%endif
+fi
 
 # install INFO_SRC, INFO_BIN into libdir (upstream thinks these are doc files,
 # but that's pretty wacko --- see also %%{name}-file-contents.patch)
@@ -1082,6 +1076,13 @@ fi
 
 
 %changelog
+* Fri Jul 29 2016 Ben Harper <ben.harper@rackspace.com> - 5.7.14-1.ius
+- Latest upstream
+- multilib fixes from Fedora:
+  http://pkgs.fedoraproject.org/cgit/rpms/community-mysql.git/commit/?id=20d65c4008bc9b668258a12e628cc33187eea4c7
+- switch to bundled l4z as it provides the needed xxhash.h from this commit:
+  https://github.com/mysql/mysql-server/commit/46cf0e7de94a459bd14fcdb9780999ddf827ee16
+
 * Fri Jun 03 2016 Carl George <carl.george@rackspace.com> - 5.7.13-1.ius
 - Latest upstream
 - Rebase Patch70
