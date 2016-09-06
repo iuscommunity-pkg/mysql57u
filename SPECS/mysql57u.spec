@@ -658,6 +658,7 @@ touch %{buildroot}%{logfile}
 mkdir -p %{buildroot}%{pidfiledir}
 install -p -m 0755 -d %{buildroot}%{dbdatadir}
 install -p -m 0750 -d %{buildroot}%{_localstatedir}/lib/mysql-files
+install -p -m 0700 -d %{buildroot}%{_localstatedir}/lib/mysql-keyring
 
 %if %{with config}
 install -D -p -m 0644 scripts/my.cnf %{buildroot}%{_sysconfdir}/my.cnf
@@ -1031,6 +1032,7 @@ fi
 %{?with_init_systemd:%{_tmpfilesdir}/%{daemon_name}.conf}
 %attr(0755,mysql,mysql) %dir %{dbdatadir}
 %attr(0750,mysql,mysql) %dir %{_localstatedir}/lib/mysql-files
+%attr(0700,mysql,mysql) %dir %{_localstatedir}/lib/mysql-keyring
 %attr(0755,mysql,mysql) %dir %{pidfiledir}
 %attr(0640,mysql,mysql) %config %ghost %verify(not md5 size mtime) %{logfile}
 %config(noreplace) %{logrotateddir}/%{daemon_name}
@@ -1078,6 +1080,7 @@ fi
 * Tue Sep 06 2016 Carl George <carl.george@rackspace.com> - 5.7.15-1.ius
 - Latest upstream
 - Remove lz4-devel build requirement, since we're using the bundled lz4
+- Create mysql-keyring directory
 
 * Fri Jul 29 2016 Ben Harper <ben.harper@rackspace.com> - 5.7.14-1.ius
 - Latest upstream
