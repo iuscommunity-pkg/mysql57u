@@ -167,6 +167,8 @@ BuildRequires:    perl(Socket)
 BuildRequires:    perl(Sys::Hostname)
 BuildRequires:    perl(Test::More)
 BuildRequires:    perl(Time::HiRes)
+BuildRequires:    perl(JSON)
+BuildRequires:    perl(File::Spec::Functions)
 %{?with_init_systemd:BuildRequires: systemd}
 
 Requires:         bash
@@ -1082,6 +1084,7 @@ fi
 - Latest upstream
 - Remove lz4-devel build requirement, since we're using the bundled lz4
 - Create mysql-keyring directory
+- Add new build requirements introduced in mysql-test/suite/opt_trace/validate_json.pl
 
 * Fri Jul 29 2016 Ben Harper <ben.harper@rackspace.com> - 5.7.14-1.ius
 - Latest upstream
