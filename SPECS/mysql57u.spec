@@ -85,7 +85,7 @@
 
 Name:             %{pkg_name}%{?ius_suffix}
 Version:          5.7.15
-Release:          1.ius%{?dist}
+Release:          2.ius%{?dist}
 Summary:          MySQL client programs and shared libraries
 Group:            Applications/Databases
 URL:              http://www.mysql.com
@@ -135,8 +135,6 @@ Patch145: boost-1.54.0-locale-unused_typedef.patch
 Patch170: boost-1.59.0-log.patch
 Patch180: boost-1.59-python-make_setter.patch
 Patch181: boost-1.59-test-fenv.patch
-
-Patch300: ctest-skips.patch
 
 BuildRequires:    cmake
 BuildRequires:    libaio-devel
@@ -451,112 +449,49 @@ pushd boost/boost_1_59_0
 %patch181 -p2
 popd
 
-%patch300 -p1
-
 # Modify tests to pass on all archs
 pushd mysql-test
 
 add_test () {
-    echo $1 >> %{skiplist}
+    echo "$@" $ >> %{skiplist}
 }
 
 touch %{skiplist}
 
-# these tests fail in 5.7.9
-add_test 'main.gis-precise                      : fails in 5.7.9'
-add_test 'main.gis                              : fails in 5.7.9'
-add_test 'gis.gis_bugs_crashes                  : fails in 5.7.9'
-add_test 'gis.spatial_analysis_functions_buffer : fails in 5.7.9'
-add_test 'gis.spatial_op_testingfunc_mix        : fails in 5.7.9'
-add_test 'gis.spatial_operators_difference      : fails in 5.7.9'
-add_test 'gis.spatial_operators_intersection    : fails in 5.7.9'
-add_test 'gis.spatial_operators_symdifference   : fails in 5.7.9'
-add_test 'main.datadir_permission               : fails in 5.7.9'
-add_test 'main.events_1                         : fails in 5.7.9'
-# these tests fail in 5.7.9 randomly
-add_test 'sysschema.fn_ps_thread_trx_info       : randomly fails in 5.7.9'
-add_test 'test_service_sql_api.test_sql_shutdown : randomly fails in 5.7.9'
-add_test 'main.mysqldump                        : randomly fails in 5.7.9'
-add_test 'perfschema.memory_aggregate_no_a_no_u : randomly fails in 5.7.9'
+# unstable on all archs
+add_test main.xa_prepared_binlog_off          : unstable test
+add_test binlog.binlog_xa_prepared_disconnect : unstable test
+add_test innodb.table_encrypt_kill            : unstable test
 
-# more tests that seem to fail randomly in 5.7.9
-add_test 'binlog.binlog_xa_prepared_disconnect : fails in 5.7.9'
-add_test 'main.grant_user_lock : fails in 5.7.9'
-
-# fails in 32bit builds on monkeyfarm
-%ifarch %{ix86}
-add_test 'xplugin.largedata                    : fails in 5.7.13 (32bit only)'
+# these tests fail in 5.7.14 on arm32
+%ifarch %arm
+# GIS related issue
+add_test innodb_gis.1     : arm32 gis issue
+add_test innodb_gis.gis   : arm32 gis issue
+add_test main.gis-precise : arm32 gis issue
+add_test main.gis         : arm32 gis issue
+add_test gis.gis_bugs_crashes : arm32 gis issue
+add_test gis.spatial_operators_intersection : arm32 gis issue
+add_test gis.spatial_operators_union : arm32 gis issue
+add_test gis.spatial_testing_functions_contains : arm32 gis issue
+add_test gis.spatial_testing_functions_crosses  : arm32 gis issue
+add_test gis.spatial_testing_functions_equals   : arm32 gis issue
+add_test gis.spatial_testing_functions_touches  : arm32 gis issue
+add_test gis.spatial_testing_functions_within   : arm32 gis issue
+# FTS
+add_test innodb_fts.opt : arm32 FTS issue
+# Missing hw counters
+add_test perfschema.func_mutex    : missing hw on arm32
+add_test perfschema.func_file_io  : missing hw on arm32
+add_test perfschema.setup_objects : missing hw on arm32
+add_test perfschema.global_read_lock : missing hw on arm32
 %endif
 
-# Workaround for upstream bug #http://bugs.mysql.com/56342
-rm -f t/ssl_8k_key-master.opt
-
-# these tests fail in 5.7.9 on arch
-%ifarch %{arm}
-add_test 'gis.spatial_operators_union  : fails in 5.7.9'
-add_test 'gis.spatial_testing_functions_contains  : fails in 5.7.9'
-add_test 'gis.spatial_testing_functions_crosses  : fails in 5.7.9'
-add_test 'gis.spatial_testing_functions_disjoint  : fails in 5.7.9'
-add_test 'gis.spatial_testing_functions_equals  : fails in 5.7.9'
-add_test 'gis.spatial_testing_functions_intersects  : fails in 5.7.9'
-add_test 'gis.spatial_testing_functions_overlaps  : fails in 5.7.9'
-add_test 'gis.spatial_testing_functions_touches  : fails in 5.7.9'
-add_test 'gis.spatial_testing_functions_within  : fails in 5.7.9'
-add_test 'innodb_fts.opt  : fails in 5.7.9'
-add_test 'innodb_gis.gis  : fails in 5.7.9'
-add_test 'innodb_gis.precise  : fails in 5.7.9'
-add_test 'innodb_gis.1  : fails in 5.7.9'
-add_test 'innodb.log_file  : fails in 5.7.9'
-add_test 'perfschema.dml_host_cache  : fails in 5.7.9'
-add_test 'perfschema.dml_hosts  : fails in 5.7.9'
-add_test 'perfschema.dml_file_instances  : fails in 5.7.9'
-add_test 'perfschema.mdl_func  : fails in 5.7.9'
-add_test 'perfschema.func_file_io  : fails in 5.7.9'
-add_test 'perfschema.setup_objects  : fails in 5.7.9'
-add_test 'test_service_sql_api.test_session_detach  : fails in 5.7.9'
-add_test 'test_service_sql_api.test_session_info  : fails in 5.7.9'
-add_test 'test_service_sql_api.test_sql_all_col_types  : fails in 5.7.9'
-add_test 'test_service_sql_api.test_sql_complex  : fails in 5.7.9'
-add_test 'test_service_sql_api.test_sql_errors  : fails in 5.7.9'
-add_test 'test_service_sql_api.test_sql_general_log  : fails in 5.7.9'
-add_test 'test_service_sql_api.test_sql_processlist  : fails in 5.7.9'
-add_test 'test_service_sql_api.test_sql_replication  : fails in 5.7.9'
-add_test 'test_service_sql_api.test_sql_sqlmode  : fails in 5.7.9'
-add_test 'test_service_sql_api.test_sql_stored_procedures_functions  : fails in 5.7.9'
-add_test 'test_service_sql_api.test_sql_views_triggers  : fails in 5.7.9'
-add_test 'test_service_sql_api.test_sql_2_sessions  : fails in 5.7.9'
-# fails sometimes
-add_test 'perfschema.func_mutex                     : fails in 5.7.9'
-add_test 'main.xa_prepared_binlog_off               : fails in 5.7.9'
-add_test 'main.innodb_icp_all                       : fails in 5.7.9'
-add_test 'perfschema.global_read_lock               : fails in 5.7.9'
+# this test fail in 5.7.14 on ppc64* and aarch64
+%ifarch ppc64 ppc64le aarch64
+add_test innodb.innodb            : missing correct value
 %endif
 
-# Archs without hw performance counter, rh 741325
-%ifarch aarch64 sparc64
-add_test 'perfschema.func_file_io  : rh 741325'
-add_test 'perfschema.func_mutex    : rh 741325'
-add_test 'perfschema.setup_objects : rh 741325'
-add_test 'perfschema.global_read_lock :  77889'
-%endif
-
-# Archs with collation issues, bugs.mysql.com/46895
-%ifarch aarch64 ppc %{power64} s390 s390x
-add_test 'innodb.innodb_ctype_ldml :  46895'
-add_test 'main.ctype_ldml          :  46895'
-%endif
-
-# Archs with ps_ddl issues
-%ifarch ppc s390
-add_test 'main.ps_ddl              : ps_ddl issue'
-add_test 'main.ps_ddl1             : ps_ddl issue'
-%endif
-
-# Arch with other issues
-%ifarch ppc
-add_test 'main.audit_plugin        : unknown'
-add_test 'main.upgrade             : unknown'
-%endif
 popd
 
 cp %{SOURCE2} %{SOURCE3} %{SOURCE10} %{SOURCE11} %{SOURCE12} %{SOURCE13} \
@@ -1080,6 +1015,9 @@ fi
 
 
 %changelog
+* Tue Sep 06 2016 Carl George <carl.george@rackspace.com> - 5.7.15-2.ius
+- Sync test suite skip list with Fedora
+
 * Tue Sep 06 2016 Carl George <carl.george@rackspace.com> - 5.7.15-1.ius
 - Latest upstream
 - Remove lz4-devel build requirement, since we're using the bundled lz4
