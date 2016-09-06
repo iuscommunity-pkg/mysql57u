@@ -84,7 +84,7 @@
 %global ius_suffix 57u
 
 Name:             %{pkg_name}%{?ius_suffix}
-Version:          5.7.14
+Version:          5.7.15
 Release:          1.ius%{?dist}
 Summary:          MySQL client programs and shared libraries
 Group:            Applications/Databases
@@ -1076,6 +1076,9 @@ fi
 
 
 %changelog
+* Tue Sep 06 2016 Carl George <carl.george@rackspace.com> - 5.7.15-1.ius
+- Latest upstream
+
 * Fri Jul 29 2016 Ben Harper <ben.harper@rackspace.com> - 5.7.14-1.ius
 - Latest upstream
 - multilib fixes from Fedora:
