@@ -774,7 +774,7 @@ polish,portuguese,romanian,russian,serbian,slovak,spanish,swedish,ukrainian}
 %endif
 
 %if %{without test}
-rm -f %{buildroot}%{_bindir}/{mysql_client_test,my_safe_process}
+rm -f %{buildroot}%{_bindir}/{mysql_client_test,mysqlxtest,my_safe_process}
 rm -rf %{buildroot}%{_datadir}/mysql-test
 rm -f %{buildroot}%{_mandir}/man1/mysql_client_test.1*
 %endif
