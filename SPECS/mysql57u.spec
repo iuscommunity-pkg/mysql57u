@@ -957,10 +957,11 @@ fi
 %{_bindir}/mysqlbinlog
 %if %{with init_systemd}
 %{_bindir}/mysqld_pre_systemd
-%endif
-%{_bindir}/mysqldumpslow
+%else
 %{_bindir}/mysqld_multi
 %{_bindir}/mysqld_safe
+%endif
+%{_bindir}/mysqldumpslow
 %{_bindir}/mysqltest
 %{_bindir}/innochecksum
 %{_bindir}/perror
