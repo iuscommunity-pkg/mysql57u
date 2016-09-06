@@ -142,7 +142,6 @@ BuildRequires:    cmake
 BuildRequires:    libaio-devel
 BuildRequires:    libedit-devel
 BuildRequires:    libevent-devel
-BuildRequires:    lz4-devel
 %if %{with mecab}
 BuildRequires:    mecab-devel
 %endif
@@ -1078,6 +1077,7 @@ fi
 %changelog
 * Tue Sep 06 2016 Carl George <carl.george@rackspace.com> - 5.7.15-1.ius
 - Latest upstream
+- Remove lz4-devel build requirement, since we're using the bundled lz4
 
 * Fri Jul 29 2016 Ben Harper <ben.harper@rackspace.com> - 5.7.14-1.ius
 - Latest upstream
