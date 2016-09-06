@@ -1115,7 +1115,7 @@ fi
   Use mysqld --initialize-insecure instead of mysql_install_db
   Create /var/lib/mysql-files (used by secure-file-priv)
     http://dev.mysql.com/doc/refman/5.7/en/server-system-variables.html#sysvar_secure_file_priv
-  Remove unnecessary Perl dependencies (mysqlhotcopy was removed in 5.7
+  Remove unnecessary Perl dependencies (mysqlhotcopy was removed in 5.7)
   Thanks Norvald H. Ryeng
 
 * Thu Jan 21 2016 Ben Harper <ben.harper@rackspace.com> - 5.7.10-1.ius
