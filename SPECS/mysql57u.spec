@@ -140,6 +140,7 @@ BuildRequires:    cmake
 BuildRequires:    libaio-devel
 BuildRequires:    libedit-devel
 BuildRequires:    libevent-devel
+BuildRequires:    lz4-devel
 %if %{with mecab}
 BuildRequires:    mecab-devel
 %endif
@@ -552,7 +553,7 @@ cmake .. \
          -DWITH_EMBEDDED_SHARED_LIBRARY=ON \
          -DWITH_EDITLINE=system \
          -DWITH_LIBEVENT=system \
-         -DWITH_LZ4=bundled \
+         -DWITH_LZ4=system \
 %if %{with mecab}
          -DWITH_MECAB=system \
 %endif
@@ -1017,6 +1018,8 @@ fi
 %changelog
 * Tue Sep 06 2016 Carl George <carl.george@rackspace.com> - 5.7.15-2.ius
 - Sync test suite skip list with Fedora
+- Switch back to system lz4, compile issue fixed upstream
+  https://github.com/mysql/mysql-server/commit/e7a7489
 
 * Tue Sep 06 2016 Carl George <carl.george@rackspace.com> - 5.7.15-1.ius
 - Latest upstream
