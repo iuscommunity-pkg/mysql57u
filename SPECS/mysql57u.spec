@@ -606,6 +606,7 @@ install -D -p -m 0644 scripts/my.cnf %{buildroot}%{_sysconfdir}/my.cnf
 %if %{with init_systemd}
 install -D -p -m 644 scripts/mysql.service %{buildroot}%{_unitdir}/%{daemon_name}.service
 install -D -p -m 0644 scripts/mysql.tmpfiles.d %{buildroot}%{_tmpfilesdir}/%{daemon_name}.conf
+rm -rf %{buildroot}%{_tmpfilesdir}/mysql.conf
 %endif
 
 # install SysV init script
@@ -1020,6 +1021,7 @@ fi
 - Sync test suite skip list with Fedora
 - Switch back to system lz4, compile issue fixed upstream
   https://github.com/mysql/mysql-server/commit/e7a7489
+- Remove duplicate tmpfiles.d file
 
 * Tue Sep 06 2016 Carl George <carl.george@rackspace.com> - 5.7.15-1.ius
 - Latest upstream
