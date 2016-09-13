@@ -173,19 +173,20 @@ BuildRequires:    perl(File::Spec::Functions)
 Requires:         bash
 Requires:         fileutils
 Requires:         grep
-Requires:         %{name}-common%{?_isa} = %{sameevr}
-Requires:         mysqlclient16
+%{?with_common:Requires: %{name}-common%{?_isa} = %{sameevr}}
 
 %if %{with mysql_names}
-Provides:         mysql = %{sameevr}
-Provides:         mysql%{?_isa} = %{sameevr}
 Provides:         mysql-compat-client = %{sameevr}
 Provides:         mysql-compat-client%{?_isa} = %{sameevr}
 %endif
 
 %{?with_conflicts:Conflicts:        mariadb}
-# mysql-cluster used to be built from this SRPM, but no more
-Obsoletes:        mysql-cluster < 5.1.44
+
+# IUS-isms
+Requires:         mysqlclient16
+Provides:         %{pkg_name} = %{sameevr}
+Provides:         %{pkg_name}%{?_isa} = %{sameevr}
+Conflicts:        %{pkg_name} < %{sameevr}
 
 # Filtering: https://fedoraproject.org/wiki/Packaging:AutoProvidesAndRequiresFiltering
 %if 0%{?fedora} > 14 || 0%{?rhel} > 6
@@ -196,10 +197,6 @@ Obsoletes:        mysql-cluster < 5.1.44
 %filter_provides_in -P (%{_datadir}/(mysql|mysql-test)/.*|%{_libdir}/mysql/plugin/.*\.so)
 %filter_setup
 %endif
-
-Provides:         %{pkg_name} = %{sameevr}
-Provides:         %{pkg_name}%{?_isa} = %{sameevr}
-Conflicts:        %{pkg_name} < %{sameevr}
 
 
 %description
@@ -213,11 +210,9 @@ contains the standard MySQL client programs and generic MySQL files.
 %package          libs
 Summary:          The shared libraries required for MySQL clients
 Group:            Applications/Databases
-Requires:         %{name}-common%{?_isa} = %{sameevr}
-%if %{with mysql_names}
-Provides:         mysql-libs = %{sameevr}
-Provides:         mysql-libs%{?_isa} = %{sameevr}
-%endif
+%{?with_common:Requires: %{name}-common%{?_isa} = %{sameevr}}
+
+# IUS-isms
 Provides:         %{pkg_name}-libs = %{sameevr}
 Provides:         %{pkg_name}-libs%{?_isa} = %{sameevr}
 Conflicts:        %{pkg_name}-libs < %{sameevr}
@@ -235,6 +230,8 @@ MySQL server.
 %package          config
 Summary:          The config files required by server and client
 Group:            Applications/Databases
+
+# IUS-isms
 Provides:         %{pkg_name}-config = %{sameevr}
 Provides:         %{pkg_name}-config%{?_isa} = %{sameevr}
 Conflicts:        %{pkg_name}-config < %{sameevr}
@@ -253,7 +250,9 @@ package itself.
 %package          common
 Summary:          The shared files required for MySQL server and client
 Group:            Applications/Databases
-Requires:         %{_sysconfdir}/my.cnf
+%{?with_config:Requires: %{name}-config%{?_isa} = %{sameevr}}
+
+# IUS-isms
 Provides:         %{pkg_name}-common = %{sameevr}
 Provides:         %{pkg_name}-common%{?_isa} = %{sameevr}
 Conflicts:        %{pkg_name}-common < %{sameevr}
@@ -270,7 +269,9 @@ MySQL package.
 %package          errmsg
 Summary:          The error messages files required by server and embedded
 Group:            Applications/Databases
-Requires:         %{name}-common%{?_isa} = %{sameevr}
+%{?with_common:Requires: %{name}-common%{?_isa} = %{sameevr}}
+
+# IUS-isms
 Provides:         %{pkg_name}-errmsg = %{sameevr}
 Provides:         %{pkg_name}-errmsg%{?_isa} = %{sameevr}
 Conflicts:        %{pkg_name}-errmsg < %{sameevr}
@@ -287,18 +288,11 @@ MySQL packages.
 Summary:          The MySQL server and related files
 Group:            Applications/Databases
 
-# note: no version here = %%{sameevr}
-%if %{with mysql_names}
-Requires:         mysql-compat-client%{?_isa}
-Requires:         mysql%{?_isa}
-%else
-Requires:         %{name}%{?_isa}
-%endif
-Requires:         %{name}-common%{?_isa} = %{sameevr}
-Requires:         %{_sysconfdir}/my.cnf
-Requires:         %{_sysconfdir}/my.cnf.d
-Requires:         %{name}-errmsg%{?_isa} = %{sameevr}
-%{?mecab:Requires: mecab-ipadic}
+Requires:         %{name}%{?_isa} = %{sameevr}
+%{?with_common:Requires: %{name}-common%{?_isa} = %{sameevr}}
+%{?with_config:Requires: %{name}-config%{?_isa} = %{sameevr}}
+%{?with_errmsg:Requires: %{name}-errmsg%{?_isa} = %{sameevr}}
+%{?with_mecab:Requires: mecab-ipadic}
 Requires:         sh-utils
 Requires(pre):    /usr/sbin/useradd
 %if %{with init_systemd}
@@ -306,18 +300,19 @@ Requires(pre):    /usr/sbin/useradd
 Requires:         systemd
 # Make sure it's there when scriptlets run, too
 %{?systemd_requires: %systemd_requires}
+%else
+Requires(post):   chkconfig
+Requires(preun):  chkconfig
 %endif
 %if %{with mysql_names}
-Provides:         mysql-server = %{sameevr}
-Provides:         mysql-server%{?_isa} = %{sameevr}
 Provides:         mysql-compat-server = %{sameevr}
 Provides:         mysql-compat-server%{?_isa} = %{sameevr}
-Obsoletes:        mysql-bench < 5.7.8
-Obsoletes:        mysql-bench%{?_isa}
 %endif
-Obsoletes:        community-mysql-bench < 5.7.8
+
 %{?with_conflicts:Conflicts:        mariadb-server}
 %{?with_conflicts:Conflicts:        mariadb-galera-server}
+
+# IUS-isms
 Provides:         %{pkg_name}-server = %{sameevr}
 Provides:         %{pkg_name}-server%{?_isa} = %{sameevr}
 Conflicts:        %{pkg_name}-server < %{sameevr}
@@ -334,9 +329,12 @@ the MySQL server and some accompanying files and directories.
 %package          devel
 Summary:          Files for development of MySQL applications
 Group:            Applications/Databases
-%{?with_clibrary:Requires:         %{name}-libs%{?_isa} = %{sameevr}}
+%{?with_clibrary:Requires: %{name}-libs%{?_isa} = %{sameevr}}
 Requires:         openssl-devel%{?_isa}
+
 %{?with_conflicts:Conflicts:        mariadb-devel}
+
+# IUS-isms
 Provides:         %{pkg_name}-devel = %{sameevr}
 Provides:         %{pkg_name}-devel%{?_isa} = %{sameevr}
 Conflicts:        %{pkg_name}-devel < %{sameevr}
@@ -353,12 +351,10 @@ developing MySQL client applications.
 %package          embedded
 Summary:          MySQL as an embeddable library
 Group:            Applications/Databases
-Requires:         %{name}-common%{?_isa} = %{sameevr}
-Requires:         %{name}-errmsg%{?_isa} = %{sameevr}
-%if %{with mysql_names}
-Provides:         mysql-embedded = %{sameevr}
-Provides:         mysql-embedded%{?_isa} = %{sameevr}
-%endif
+%{?with_common:Requires: %{name}-common%{?_isa} = %{sameevr}}
+%{?with_errmsg:Requires: %{name}-errmsg%{?_isa} = %{sameevr}}
+
+# IUS-isms
 Provides:         %{pkg_name}-embedded = %{sameevr}
 Provides:         %{pkg_name}-embedded%{?_isa} = %{sameevr}
 Conflicts:        %{pkg_name}-embedded < %{sameevr}
@@ -373,9 +369,12 @@ into a client application instead of running as a separate process.
 %package          embedded-devel
 Summary:          Development files for MySQL as an embeddable library
 Group:            Applications/Databases
-Requires:         %{name}-embedded%{?_isa} = %{sameevr}
-Requires:         %{name}-devel%{?_isa} = %{sameevr}
+%{?with_embedded:Requires: %{name}-embedded%{?_isa} = %{sameevr}}
+%{?with_devel:Requires: %{name}-devel%{?_isa} = %{sameevr}}
+
 %{?with_conflicts:Conflicts:        mariadb-embedded-devel}
+
+# IUS-isms
 Provides:         %{pkg_name}-embedded-devel = %{sameevr}
 Provides:         %{pkg_name}-embedded-devel%{?_isa} = %{sameevr}
 Conflicts:        %{pkg_name}-embedded-devel < %{sameevr}
@@ -393,7 +392,7 @@ the embedded version of the MySQL server.
 Summary:          The test suite distributed with MySQL
 Group:            Applications/Databases
 Requires:         %{name}%{?_isa} = %{sameevr}
-Requires:         %{name}-common%{?_isa} = %{sameevr}
+%{?with_common:Requires: %{name}-common%{?_isa} = %{sameevr}}
 Requires:         %{name}-server%{?_isa} = %{sameevr}
 Requires:         perl(Digest::file)
 Requires:         perl(Digest::MD5)
@@ -408,11 +407,10 @@ Requires:         perl(Socket)
 Requires:         perl(Sys::Hostname)
 Requires:         perl(Test::More)
 Requires:         perl(Time::HiRes)
+
 %{?with_conflicts:Conflicts:        mariadb-test}
-%if %{with mysql_names}
-Provides:         mysql-test = %{sameevr}
-Provides:         mysql-test%{?_isa} = %{sameevr}
-%endif
+
+# IUS-isms
 Provides:         %{pkg_name}-test = %{sameevr}
 Provides:         %{pkg_name}-test%{?_isa} = %{sameevr}
 Conflicts:        %{pkg_name}-test < %{sameevr}
@@ -1022,6 +1020,7 @@ fi
 - Switch back to system lz4, compile issue fixed upstream
   https://github.com/mysql/mysql-server/commit/e7a7489
 - Remove duplicate tmpfiles.d file
+- Clean up provides, requires, conflicts, and obsoletes
 
 * Tue Sep 06 2016 Carl George <carl.george@rackspace.com> - 5.7.15-1.ius
 - Latest upstream
