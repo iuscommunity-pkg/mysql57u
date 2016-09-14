@@ -461,6 +461,7 @@ touch %{skiplist}
 add_test main.xa_prepared_binlog_off          : unstable test
 add_test binlog.binlog_xa_prepared_disconnect : unstable test
 add_test innodb.table_encrypt_kill            : unstable test
+add_test main.grant_user_lock                 : unstable test
 
 # these tests fail in 5.7.14 on arm32
 %ifarch %arm
@@ -1021,6 +1022,7 @@ fi
   https://github.com/mysql/mysql-server/commit/e7a7489
 - Remove duplicate tmpfiles.d file
 - Clean up provides, requires, conflicts, and obsoletes
+- Skip main.grant_user_lock test
 
 * Tue Sep 06 2016 Carl George <carl.george@rackspace.com> - 5.7.15-1.ius
 - Latest upstream
