@@ -84,8 +84,8 @@
 %global ius_suffix 57u
 
 Name:             %{pkg_name}%{?ius_suffix}
-Version:          5.7.15
-Release:          2.ius%{?dist}
+Version:          5.7.16
+Release:          1.ius%{?dist}
 Summary:          MySQL client programs and shared libraries
 Group:            Applications/Databases
 URL:              http://www.mysql.com
@@ -1016,6 +1016,9 @@ fi
 
 
 %changelog
+* Thu Oct 13 2016 Carl George <carl.george@rackspace.com> - 5.7.16-1.ius
+- Latest upstream
+
 * Tue Sep 06 2016 Carl George <carl.george@rackspace.com> - 5.7.15-2.ius
 - Sync test suite skip list with Fedora
 - Switch back to system lz4, compile issue fixed upstream
