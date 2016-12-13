@@ -84,7 +84,7 @@
 %global ius_suffix 57u
 
 Name:             %{pkg_name}%{?ius_suffix}
-Version:          5.7.16
+Version:          5.7.17
 Release:          1.ius%{?dist}
 Summary:          MySQL client programs and shared libraries
 Group:            Applications/Databases
@@ -1016,6 +1016,9 @@ fi
 
 
 %changelog
+* Tue Dec 13 2016 Carl George <carl.george@rackspace.com> - 5.7.17-1.ius
+- Latest upstream
+
 * Thu Oct 13 2016 Carl George <carl.george@rackspace.com> - 5.7.16-1.ius
 - Latest upstream
 
