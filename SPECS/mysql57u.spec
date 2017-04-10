@@ -219,7 +219,7 @@ Conflicts:        %{pkg_name}-libs < %{sameevr}
 
 
 %description      libs
-The mysql-libs package provides the essential shared libraries for any 
+The mysql-libs package provides the essential shared libraries for any
 MySQL client program or interface. You will need to install this package
 to use any other MySQL package or any clients that need to connect to a
 MySQL server.
@@ -1227,7 +1227,7 @@ fi
 - outfile_loaddata resolved on all archs
 - Solaris files not installed, no need to remove
 - Simplify multilib install
-- Use install's -D option some places 
+- Use install's -D option some places
 - Add explicit conflict with mariadb-galera-server
 
 * Sat Jun 07 2014 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 5.6.17-3
@@ -2158,7 +2158,7 @@ Resolves: #199368
   pinging mysql server (#108779)
 
 * Mon Oct 27 2003 Kim Ho <kho@redhat.com> 3.23.58-4
-- update mysql.init to wait (max 10 seconds) for mysql server to 
+- update mysql.init to wait (max 10 seconds) for mysql server to
   start (#58732)
 
 * Mon Oct 27 2003 Patrick Macdonald <patrickm@redhat.com> 3.23.58-3
@@ -2175,7 +2175,7 @@ Resolves: #199368
 - rebuilt
 
 * Wed Jul 02 2003 Patrick Macdonald <patrickm@redhat.com> 3.23.57-1
-- revert to prior version of MySQL due to license incompatibilities 
+- revert to prior version of MySQL due to license incompatibilities
   with packages that link against the client.  The MySQL folks are
   looking into the issue.
 
@@ -2186,18 +2186,18 @@ Resolves: #199368
 - rebuilt
 
 * Thu May 29 2003 Patrick Macdonald <patrickm@redhat.com> 4.0.13-2
-- fix filter-requires-mysql.sh with less restrictive for mysql-bench 
+- fix filter-requires-mysql.sh with less restrictive for mysql-bench
 
 * Wed May 28 2003 Patrick Macdonald <patrickm@redhat.com> 4.0.13-1
 - update for MySQL 4.0
 - back-level shared libraries available in mysqlclient10 package
 
 * Fri May 09 2003 Patrick Macdonald <patrickm@redhat.com> 3.23.56-2
-- add sql-bench package (#90110) 
+- add sql-bench package (#90110)
 
 * Wed Mar 19 2003 Patrick Macdonald <patrickm@redhat.com> 3.23.56-1
 - upgrade to 3.23.56 for security fixes
-- remove patch for double-free (included in 3.23.56) 
+- remove patch for double-free (included in 3.23.56)
 
 * Tue Feb 18 2003 Patrick Macdonald <patrickm@redhat.com> 3.23.54a-11
 - enable thread safe client
@@ -2255,11 +2255,11 @@ Resolves: #199368
 - rebuild
 
 * Thu Jul 18 2002 Trond Eivind Glomsrd <teg@redhat.com> 3.23.51-3
-- Fix #63543 and #63542 
+- Fix #63543 and #63542
 
 * Thu Jul 11 2002 Trond Eivind Glomsrd <teg@redhat.com> 3.23.51-2
 - Turn off bdb on PPC(#68591)
-- Turn off the assembly optimizations, for safety. 
+- Turn off the assembly optimizations, for safety.
 
 * Wed Jun 26 2002 Trond Eivind Glomsrd <teg@redhat.com> 3.23.51-1
 - Work around annoying auto* thinking this is a crosscompile
@@ -2301,12 +2301,12 @@ Resolves: #199368
 - 3.23.48
 
 * Thu Jan 17 2002 Trond Eivind Glomsrd <teg@redhat.com> 3.23.47-4
-- Use kill, not mysqladmin, to flush logs and shut down. Thus, 
+- Use kill, not mysqladmin, to flush logs and shut down. Thus,
   an admin password can be set with no problems.
 - Remove reload from init script
 
 * Wed Jan 16 2002 Trond Eivind Glomsrd <teg@redhat.com> 3.23.47-3
-- remove db3-devel from buildrequires, 
+- remove db3-devel from buildrequires,
   MySQL has had its own bundled copy since the mid thirties
 
 * Sun Jan  6 2002 Trond Eivind Glomsrd <teg@redhat.com> 3.23.47-1
@@ -2315,7 +2315,7 @@ Resolves: #199368
 
 * Mon Dec  3 2001 Trond Eivind Glomsrd <teg@redhat.com> 3.23.46-1
 - 3.23.46
-- use -fno-rtti and -fno-exceptions, and set CXX to increase stability. 
+- use -fno-rtti and -fno-exceptions, and set CXX to increase stability.
   Recommended by mysql developers.
 
 * Sun Nov 25 2001 Trond Eivind Glomsrd <teg@redhat.com> 3.23.45-1
@@ -2337,7 +2337,7 @@ Resolves: #199368
 * Tue Aug 14 2001 Trond Eivind Glomsrd <teg@redhat.com> 3.23.41-1
 - 3.23.41 bugfix release
 - disable innodb, to avoid the broken updates
-- Use "mysqladmin flush_logs" instead of kill -HUP in logrotate 
+- Use "mysqladmin flush_logs" instead of kill -HUP in logrotate
   script (#51711)
 
 * Sat Jul 21 2001 Trond Eivind Glomsrd <teg@redhat.com>
@@ -2386,7 +2386,7 @@ Resolves: #199368
 - small i18n-fixes to initscript (action needs $)
 
 * Tue Jan 30 2001 Trond Eivind Glomsrd <teg@redhat.com>
-- make it shut down and rotate logs without using mysqladmin 
+- make it shut down and rotate logs without using mysqladmin
   (from #24909)
 
 * Mon Jan 29 2001 Trond Eivind Glomsrd <teg@redhat.com>
@@ -2411,14 +2411,14 @@ Resolves: #199368
 - as above in logrotate script
 - changes to the init sequence - put most of the data
   in /etc/my.cnf instead of hardcoding in the init script
-- use /var/run/mysqld/mysqld.pid instead of 
+- use /var/run/mysqld/mysqld.pid instead of
   /var/run/mysqld/pid
 - use standard safe_mysqld
 - shut down cleaner
 
 * Mon Jan 08 2001 Trond Eivind Glomsrd <teg@redhat.com>
 - 3.23.30
-- do an explicit chmod on /var/lib/mysql in post, to avoid 
+- do an explicit chmod on /var/lib/mysql in post, to avoid
   any problems with broken permissons. There is a report
   of rm not changing this on its own (#22989)
 
@@ -2467,7 +2467,7 @@ Resolves: #199368
   instead of tempnam().
 - revert changes made yesterday, the problem is now
   isolated
- 
+
 * Tue Oct 17 2000 Trond Eivind Glomsrd <teg@redhat.com>
 - use the compat C++ compiler FTTB. Argh.
 - add requirement of ncurses4 (see above)
@@ -2484,8 +2484,8 @@ Resolves: #199368
 - rename config file to /etc/my.cnf, which is what
   mysqld wants... doh. (#17432)
 - include a changed safe_mysqld, so the pid file option
-  works. 
-- make mysql dir world readable to they can access the 
+  works.
+- make mysql dir world readable to they can access the
   mysql socket. (#17432)
 - 3.23.24
 
@@ -2496,7 +2496,7 @@ Resolves: #199368
 - Add "|| :" to condrestart to avoid non-zero exit code
 
 * Thu Aug 24 2000 Trond Eivind Glomsrd <teg@redhat.com>
-- it's mysql.com, not mysql.org and use correct path to 
+- it's mysql.com, not mysql.org and use correct path to
   source (#16830)
 
 * Wed Aug 16 2000 Trond Eivind Glomsrd <teg@redhat.com>
@@ -2533,14 +2533,14 @@ Resolves: #199368
 - more cleanups in initscript
 
 * Thu Jul 13 2000 Trond Eivind Glomsrd <teg@redhat.com>
-- add a patch to work around compiler bug 
-  (from monty@mysql.com) 
+- add a patch to work around compiler bug
+  (from monty@mysql.com)
 
 * Wed Jul 12 2000 Trond Eivind Glomsrd <teg@redhat.com>
 - don't build the SQL daemon statically (glibc problems)
 - fix the logrotate script - only flush log if mysql
   is running
-- change the reloading procedure 
+- change the reloading procedure
 - remove icon - glint is obsolete a long time ago
 
 * Wed Jul 12 2000 Prospector <bugzilla@redhat.com>
