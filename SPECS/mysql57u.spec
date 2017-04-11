@@ -325,7 +325,8 @@ the MySQL server and some accompanying files and directories.
 Summary:          Files for development of MySQL applications
 Group:            Applications/Databases
 %{?with_clibrary:Requires: %{name}-libs%{?_isa} = %{sameevr}}
-Requires:         openssl-devel%{?_isa}
+Requires:         pkgconfig(openssl)
+Requires:         zlib-devel
 
 %{?with_conflicts:Conflicts:        mariadb-devel}
 
@@ -366,7 +367,10 @@ Summary:          Development files for MySQL as an embeddable library
 Group:            Applications/Databases
 %{?with_embedded:Requires: %{name}-embedded%{?_isa} = %{sameevr}}
 %{?with_devel:Requires: %{name}-devel%{?_isa} = %{sameevr}}
-
+Requires:         libaio-devel
+Requires:         lz4-devel
+Requires:         pkgconfig(openssl)
+Requires:         zlib-devel
 %{?with_conflicts:Conflicts:        mariadb-embedded-devel}
 
 # safe replacement
@@ -398,6 +402,7 @@ Requires:         perl(File::Temp)
 Requires:         perl(Data::Dumper)
 Requires:         perl(Getopt::Long)
 Requires:         perl(IPC::Open3)
+Requires:         perl(JSON)
 Requires:         perl(Socket)
 Requires:         perl(Sys::Hostname)
 Requires:         perl(Test::More)
@@ -1003,6 +1008,7 @@ fi
 * Tue Apr 11 2017 Carl George <carl.george@rackspace.com> - 5.7.18-1.ius
 - Latest upstream
 - Sync test suite with Fedora
+- Add missing deps from Fedora
 
 * Tue Dec 13 2016 Carl George <carl.george@rackspace.com> - 5.7.17-1.ius
 - Latest upstream
