@@ -457,6 +457,8 @@ add_test main.xa_prepared_binlog_off          : unstable test
 add_test binlog.binlog_xa_prepared_disconnect : unstable test
 add_test innodb.table_encrypt_kill            : unstable test
 add_test main.grant_user_lock                 : unstable test
+add_test perfschema.memory_aggregate_no_a_no_u_no_h : unstable test
+add_test main.mysqlpump_basic                 :  unstable test
 
 # these tests fail in 5.7.14 on arm32
 %ifarch %arm
@@ -476,10 +478,11 @@ add_test gis.spatial_testing_functions_within   : arm32 gis issue
 # FTS
 add_test innodb_fts.opt : arm32 FTS issue
 # Missing hw counters
-add_test perfschema.func_mutex    : missing hw on arm32
-add_test perfschema.func_file_io  : missing hw on arm32
-add_test perfschema.setup_objects : missing hw on arm32
-add_test perfschema.global_read_lock : missing hw on arm32
+add_test perfschema.func_mutex          : missing hw on arm32
+add_test perfschema.func_file_io        : missing hw on arm32
+add_test perfschema.mdl_func            : missing hw on arm32
+add_test perfschema.setup_objects       : missing hw on arm32
+add_test perfschema.global_read_lock    : missing hw on arm32
 %endif
 
 # this test fail in 5.7.14 on ppc64* and aarch64
@@ -716,8 +719,8 @@ cp ../../mysql-test/%{skiplist} .
 # builds might happen at the same host, avoid collision
 export MTR_BUILD_THREAD=%{__isa_bits}
 ./mtr \
-  --mem --parallel=auto --force --retry=0 \
-  --mysqld=--binlog-format=mixed \
+  --mem --parallel=auto --force --retry=2 \
+  --mysqld=--binlog-format=mixed --skip-rpl \
   --suite-timeout=720 --testcase-timeout=30 \
   --clean-vardir \
 %if %{check_testsuite}
@@ -999,6 +1002,7 @@ fi
 %changelog
 * Tue Apr 11 2017 Carl George <carl.george@rackspace.com> - 5.7.18-1.ius
 - Latest upstream
+- Sync test suite with Fedora
 
 * Tue Dec 13 2016 Carl George <carl.george@rackspace.com> - 5.7.17-1.ius
 - Latest upstream
