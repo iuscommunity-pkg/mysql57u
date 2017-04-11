@@ -84,7 +84,7 @@
 %global ius_suffix 57u
 
 Name:             %{pkg_name}%{?ius_suffix}
-Version:          5.7.17
+Version:          5.7.18
 Release:          1.ius%{?dist}
 Summary:          MySQL client programs and shared libraries
 Group:            Applications/Databases
@@ -955,7 +955,6 @@ fi
 %{_datadir}/%{pkg_name}/mysql_system_tables.sql
 %{_datadir}/%{pkg_name}/mysql_system_tables_data.sql
 %{_datadir}/%{pkg_name}/mysql_test_data_timezone.sql
-%{_datadir}/%{pkg_name}/my-*.cnf
 %{_datadir}/%{pkg_name}/uninstall_rewriter.sql
 
 %{daemondir}/%{daemon_name}*
@@ -1016,6 +1015,9 @@ fi
 
 
 %changelog
+* Tue Apr 11 2017 Carl George <carl.george@rackspace.com> - 5.7.18-1.ius
+- Latest upstream
+
 * Tue Dec 13 2016 Carl George <carl.george@rackspace.com> - 5.7.17-1.ius
 - Latest upstream
 
