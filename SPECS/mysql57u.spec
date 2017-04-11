@@ -31,7 +31,6 @@
 %bcond_without embedded
 %bcond_without devel
 %bcond_without client
-%bcond_without common
 %bcond_without errmsg
 %bcond_without test
 
@@ -72,7 +71,7 @@
 %global mysqluserhome /var/lib/mysql
 
 # Provide mysql names for compatibility
-%bcond_without mysql_names
+%bcond_without mysql_compat_names
 %bcond_without conflicts
 
 # Make long macros shorter
@@ -81,9 +80,7 @@
 # Add "--with mecab" build option to optionally enable mecab full-text parser plugin
 %bcond_with mecab
 
-%global ius_suffix 57u
-
-Name:             %{pkg_name}%{?ius_suffix}
+Name:             mysql57u
 Version:          5.7.18
 Release:          1.ius%{?dist}
 Summary:          MySQL client programs and shared libraries
@@ -141,9 +138,7 @@ BuildRequires:    libaio-devel
 BuildRequires:    libedit-devel
 BuildRequires:    libevent-devel
 BuildRequires:    lz4-devel
-%if %{with mecab}
-BuildRequires:    mecab-devel
-%endif
+%{?with_mecab:BuildRequires: mecab-devel}
 BuildRequires:    openssl-devel
 BuildRequires:    perl
 BuildRequires:    systemtap-sdt-devel
@@ -173,20 +168,21 @@ BuildRequires:    perl(File::Spec::Functions)
 Requires:         bash
 Requires:         fileutils
 Requires:         grep
-%{?with_common:Requires: %{name}-common%{?_isa} = %{sameevr}}
+Requires:         %{name}-common%{?_isa} = %{sameevr}
 
-%if %{with mysql_names}
+%if %{with mysql_compat_names}
 Provides:         mysql-compat-client = %{sameevr}
 Provides:         mysql-compat-client%{?_isa} = %{sameevr}
 %endif
 
 %{?with_conflicts:Conflicts:        mariadb}
 
-# IUS-isms
 Requires:         mysqlclient16
-Provides:         %{pkg_name} = %{sameevr}
-Provides:         %{pkg_name}%{?_isa} = %{sameevr}
-Conflicts:        %{pkg_name} < %{sameevr}
+
+# safe replacement
+Provides:         mysql = %{sameevr}
+Provides:         mysql%{?_isa} = %{sameevr}
+Conflicts:        mysql < %{sameevr}
 
 # Filtering: https://fedoraproject.org/wiki/Packaging:AutoProvidesAndRequiresFiltering
 %if 0%{?fedora} > 14 || 0%{?rhel} > 6
@@ -210,12 +206,12 @@ contains the standard MySQL client programs and generic MySQL files.
 %package          libs
 Summary:          The shared libraries required for MySQL clients
 Group:            Applications/Databases
-%{?with_common:Requires: %{name}-common%{?_isa} = %{sameevr}}
+Requires:         %{name}-common%{?_isa} = %{sameevr}
 
-# IUS-isms
-Provides:         %{pkg_name}-libs = %{sameevr}
-Provides:         %{pkg_name}-libs%{?_isa} = %{sameevr}
-Conflicts:        %{pkg_name}-libs < %{sameevr}
+# safe replacement
+Provides:         mysql-libs = %{sameevr}
+Provides:         mysql-libs%{?_isa} = %{sameevr}
+Conflicts:        mysql-libs < %{sameevr}
 
 
 %description      libs
@@ -231,11 +227,11 @@ MySQL server.
 Summary:          The config files required by server and client
 Group:            Applications/Databases
 
-# IUS-isms
-Provides:         %{pkg_name}-config = %{sameevr}
-Provides:         %{pkg_name}-config%{?_isa} = %{sameevr}
-Conflicts:        %{pkg_name}-config < %{sameevr}
-Conflicts:        %{pkg_name}-libs < %{sameevr}
+# safe replacement
+Provides:         mysql-config = %{sameevr}
+Provides:         mysql-config%{?_isa} = %{sameevr}
+Conflicts:        mysql-config < %{sameevr}
+Conflicts:        mysql-libs < %{sameevr}
 
 
 %description      config
@@ -246,35 +242,33 @@ package itself.
 %endif
 
 
-%if %{with common}
 %package          common
 Summary:          The shared files required for MySQL server and client
 Group:            Applications/Databases
 %{?with_config:Requires: %{name}-config%{?_isa} = %{sameevr}}
 
-# IUS-isms
-Provides:         %{pkg_name}-common = %{sameevr}
-Provides:         %{pkg_name}-common%{?_isa} = %{sameevr}
-Conflicts:        %{pkg_name}-common < %{sameevr}
+# safe replacement
+Provides:         mysql-common = %{sameevr}
+Provides:         mysql-common%{?_isa} = %{sameevr}
+Conflicts:        mysql-common < %{sameevr}
 
 
 %description      common
 The mysql-common package provides the essential shared files for any
 MySQL program. You will need to install this package to use any other
 MySQL package.
-%endif
 
 
 %if %{with errmsg}
 %package          errmsg
 Summary:          The error messages files required by server and embedded
 Group:            Applications/Databases
-%{?with_common:Requires: %{name}-common%{?_isa} = %{sameevr}}
+Requires:         %{name}-common%{?_isa} = %{sameevr}
 
-# IUS-isms
-Provides:         %{pkg_name}-errmsg = %{sameevr}
-Provides:         %{pkg_name}-errmsg%{?_isa} = %{sameevr}
-Conflicts:        %{pkg_name}-errmsg < %{sameevr}
+# safe replacement
+Provides:         mysql-errmsg = %{sameevr}
+Provides:         mysql-errmsg%{?_isa} = %{sameevr}
+Conflicts:        mysql-errmsg < %{sameevr}
 
 
 %description      errmsg
@@ -289,7 +283,7 @@ Summary:          The MySQL server and related files
 Group:            Applications/Databases
 
 Requires:         %{name}%{?_isa} = %{sameevr}
-%{?with_common:Requires: %{name}-common%{?_isa} = %{sameevr}}
+Requires:         %{name}-common%{?_isa} = %{sameevr}
 %{?with_config:Requires: %{name}-config%{?_isa} = %{sameevr}}
 %{?with_errmsg:Requires: %{name}-errmsg%{?_isa} = %{sameevr}}
 %{?with_mecab:Requires: mecab-ipadic}
@@ -300,11 +294,12 @@ Requires(pre):    /usr/sbin/useradd
 Requires:         systemd
 # Make sure it's there when scriptlets run, too
 %{?systemd_requires: %systemd_requires}
-%else
+%endif
+%if %{with init_sysv}
 Requires(post):   chkconfig
 Requires(preun):  chkconfig
 %endif
-%if %{with mysql_names}
+%if %{with mysql_compat_names}
 Provides:         mysql-compat-server = %{sameevr}
 Provides:         mysql-compat-server%{?_isa} = %{sameevr}
 %endif
@@ -312,10 +307,10 @@ Provides:         mysql-compat-server%{?_isa} = %{sameevr}
 %{?with_conflicts:Conflicts:        mariadb-server}
 %{?with_conflicts:Conflicts:        mariadb-galera-server}
 
-# IUS-isms
-Provides:         %{pkg_name}-server = %{sameevr}
-Provides:         %{pkg_name}-server%{?_isa} = %{sameevr}
-Conflicts:        %{pkg_name}-server < %{sameevr}
+# safe replacement
+Provides:         mysql-server = %{sameevr}
+Provides:         mysql-server%{?_isa} = %{sameevr}
+Conflicts:        mysql-server < %{sameevr}
 
 
 %description      server
@@ -334,10 +329,10 @@ Requires:         openssl-devel%{?_isa}
 
 %{?with_conflicts:Conflicts:        mariadb-devel}
 
-# IUS-isms
-Provides:         %{pkg_name}-devel = %{sameevr}
-Provides:         %{pkg_name}-devel%{?_isa} = %{sameevr}
-Conflicts:        %{pkg_name}-devel < %{sameevr}
+# safe replacement
+Provides:         mysql-devel = %{sameevr}
+Provides:         mysql-devel%{?_isa} = %{sameevr}
+Conflicts:        mysql-devel < %{sameevr}
 
 
 %description      devel
@@ -351,13 +346,13 @@ developing MySQL client applications.
 %package          embedded
 Summary:          MySQL as an embeddable library
 Group:            Applications/Databases
-%{?with_common:Requires: %{name}-common%{?_isa} = %{sameevr}}
+Requires:         %{name}-common%{?_isa} = %{sameevr}
 %{?with_errmsg:Requires: %{name}-errmsg%{?_isa} = %{sameevr}}
 
-# IUS-isms
-Provides:         %{pkg_name}-embedded = %{sameevr}
-Provides:         %{pkg_name}-embedded%{?_isa} = %{sameevr}
-Conflicts:        %{pkg_name}-embedded < %{sameevr}
+# safe replacement
+Provides:         mysql-embedded = %{sameevr}
+Provides:         mysql-embedded%{?_isa} = %{sameevr}
+Conflicts:        mysql-embedded < %{sameevr}
 
 
 %description      embedded
@@ -374,10 +369,10 @@ Group:            Applications/Databases
 
 %{?with_conflicts:Conflicts:        mariadb-embedded-devel}
 
-# IUS-isms
-Provides:         %{pkg_name}-embedded-devel = %{sameevr}
-Provides:         %{pkg_name}-embedded-devel%{?_isa} = %{sameevr}
-Conflicts:        %{pkg_name}-embedded-devel < %{sameevr}
+# safe replacement
+Provides:         mysql-embedded-devel = %{sameevr}
+Provides:         mysql-embedded-devel%{?_isa} = %{sameevr}
+Conflicts:        mysql-embedded-devel < %{sameevr}
 
 
 %description      embedded-devel
@@ -392,7 +387,7 @@ the embedded version of the MySQL server.
 Summary:          The test suite distributed with MySQL
 Group:            Applications/Databases
 Requires:         %{name}%{?_isa} = %{sameevr}
-%{?with_common:Requires: %{name}-common%{?_isa} = %{sameevr}}
+Requires:         %{name}-common%{?_isa} = %{sameevr}
 Requires:         %{name}-server%{?_isa} = %{sameevr}
 Requires:         perl(Digest::file)
 Requires:         perl(Digest::MD5)
@@ -410,10 +405,10 @@ Requires:         perl(Time::HiRes)
 
 %{?with_conflicts:Conflicts:        mariadb-test}
 
-# IUS-isms
-Provides:         %{pkg_name}-test = %{sameevr}
-Provides:         %{pkg_name}-test%{?_isa} = %{sameevr}
-Conflicts:        %{pkg_name}-test < %{sameevr}
+# safe replacement
+Provides:         mysql-test = %{sameevr}
+Provides:         mysql-test%{?_isa} = %{sameevr}
+Conflicts:        mysql-test < %{sameevr}
 
 
 %description      test
@@ -553,9 +548,7 @@ cmake .. \
          -DWITH_EDITLINE=system \
          -DWITH_LIBEVENT=system \
          -DWITH_LZ4=system \
-%if %{with mecab}
-         -DWITH_MECAB=system \
-%endif
+%{?with_mecab: -DWITH_MECAB=system} \
          -DWITH_SSL=system \
          -DWITH_ZLIB=system \
          -DWITH_BOOST=../boost/boost_1_59_0 \
@@ -700,10 +693,6 @@ mkdir -p %{buildroot}%{_sysconfdir}/my.cnf.d
 rm -f %{buildroot}%{_sysconfdir}/my.cnf
 %endif
 
-%if %{without common}
-rm -rf %{buildroot}%{_datadir}/%{pkg_name}/charsets
-%endif
-
 %if %{without errmsg}
 rm -f %{buildroot}%{_datadir}/%{pkg_name}/errmsg-utf8.txt
 rm -rf %{buildroot}%{_datadir}/%{pkg_name}/{english,bulgarian,czech,danish,dutch,estonian,\
@@ -842,14 +831,12 @@ fi
 %endif
 
 
-%if %{with common}
 %files common
 %doc README COPYING README.mysql-license README.mysql-docs
 %doc storage/innobase/COPYING.Percona storage/innobase/COPYING.Google
 %dir %{_libdir}/mysql
 %dir %{_datadir}/%{pkg_name}
 %{_datadir}/%{pkg_name}/charsets
-%endif
 
 
 %if %{with errmsg}
@@ -892,7 +879,6 @@ fi
 %{_bindir}/mysql_ssl_rsa_setup
 %{_bindir}/mysql_tzinfo_to_sql
 %{_bindir}/mysql_upgrade
-%{_bindir}/mysqlbinlog
 %if %{with init_systemd}
 %{_bindir}/mysqld_pre_systemd
 %else
@@ -909,16 +895,12 @@ fi
 %{_bindir}/lz4_decompress
 %{_bindir}/zlib_decompress
 
-
 %config(noreplace) %{_sysconfdir}/my.cnf.d/%{pkg_name}-server.cnf
 
 %{_libexecdir}/mysqld
 
 %{_libdir}/mysql/INFO_SRC
 %{_libdir}/mysql/INFO_BIN
-%if %{without common}
-%dir %{_datadir}/%{pkg_name}
-%endif
 
 %{_libdir}/mysql/plugin
 
