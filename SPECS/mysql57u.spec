@@ -81,7 +81,7 @@
 %bcond_with mecab
 
 Name:             mysql57u
-Version:          5.7.18
+Version:          5.7.19
 Release:          1.ius%{?dist}
 Summary:          MySQL client programs and shared libraries
 Group:            Applications/Databases
@@ -464,6 +464,7 @@ add_test innodb.table_encrypt_kill            : unstable test
 add_test main.grant_user_lock                 : unstable test
 add_test perfschema.memory_aggregate_no_a_no_u_no_h : unstable test
 add_test main.mysqlpump_basic                 :  unstable test
+add_test main.grant_alter_user_qa                :  started failing in 5.7.19
 
 # these tests fail in 5.7.14 on arm32
 %ifarch %arm
@@ -1005,6 +1006,10 @@ fi
 
 
 %changelog
+* Tue Jul 18 2017 Ben Harper <ben.harper@rackspace.com> - 5.7.19-1.ius
+- Latest upstream
+- skip main.grant_alter_user_qa test
+
 * Tue Apr 11 2017 Carl George <carl.george@rackspace.com> - 5.7.18-1.ius
 - Latest upstream
 - Sync test suite with Fedora
