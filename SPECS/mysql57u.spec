@@ -81,7 +81,7 @@
 %bcond_with mecab
 
 Name:             mysql57u
-Version:          5.7.19
+Version:          5.7.20
 Release:          1.ius%{?dist}
 Summary:          MySQL client programs and shared libraries
 Group:            Applications/Databases
@@ -169,6 +169,8 @@ Requires:         bash
 Requires:         fileutils
 Requires:         grep
 Requires:         %{name}-common%{?_isa} = %{sameevr}
+
+Provides:         bundled(boost) = 1.59
 
 %if %{with mysql_compat_names}
 Provides:         mysql-compat-client = %{sameevr}
@@ -728,7 +730,7 @@ export MTR_BUILD_THREAD=%{__isa_bits}
   --mem --parallel=auto --force --retry=2 \
   --mysqld=--binlog-format=mixed --skip-rpl \
   --suite-timeout=720 --testcase-timeout=30 \
-  --clean-vardir \
+  --report-unstable-tests --clean-vardir \
 %if %{check_testsuite}
   --max-test-fail=0 || :
 %else
@@ -1006,6 +1008,18 @@ fi
 
 
 %changelog
+* Mon Oct 16 2017 Ben Harper <ben.harper@rackspace.com> - 5.7.20-1.ius
+- Latest upstream
+- update Source12 from Fedora:
+  https://src.fedoraproject.org/rpms/community-mysql/c/dd8b0ea73050c32dc165f2cea4c8170f82630d6a
+- Add bundled(boost) virtual provide from Fedora:
+  https://src.fedoraproject.org/rpms/community-mysql/c/8ac654b88b1c934c639e3d414560e7cceba48a1e
+- update Source19 from Fedora:
+  https://src.fedoraproject.org/rpms/community-mysql/c/435e717ad0ea73e3c4af48dbd0b3b6cc495aef82
+  https://src.fedoraproject.org/rpms/community-mysql/c/84ceb88ce754fa5f905748ecd9f0988e16d0d76b
+- add --report-unstable-tests from Fedora:
+  https://src.fedoraproject.org/rpms/community-mysql/c/77ff3a5e4005b31d6b73ae07ecea8b24568c6636
+
 * Tue Jul 18 2017 Ben Harper <ben.harper@rackspace.com> - 5.7.19-1.ius
 - Latest upstream
 - skip main.grant_alter_user_qa test
