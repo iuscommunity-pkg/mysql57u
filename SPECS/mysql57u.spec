@@ -82,7 +82,7 @@
 
 Name:             mysql57u
 Version:          5.7.20
-Release:          1.ius%{?dist}
+Release:          2.ius%{?dist}
 Summary:          MySQL client programs and shared libraries
 Group:            Applications/Databases
 URL:              http://www.mysql.com
@@ -764,7 +764,9 @@ if [ $1 = 1 ]; then
     /sbin/chkconfig --add %{daemon_name}
 fi
 %endif
-/bin/touch %{logfile}
+if [ ! -e "%{logfile}" -a ! -h "%{logfile}" ] ; then
+    install /dev/null -m0640 -omysql -gmysql "%{logfile}"
+fi
 
 %preun server
 %if %{with init_systemd}
@@ -1008,6 +1010,10 @@ fi
 
 
 %changelog
+* Fri Nov 10 2017 Ben Harper <ben.harper@rackspace.com> - 5.7.20-2.ius
+- fix log permissions from Ferora:
+  https://src.fedoraproject.org/rpms/community-mysql/c/51a726ceaa5a822781e56b6767ed0d94f8a78503
+
 * Mon Oct 16 2017 Ben Harper <ben.harper@rackspace.com> - 5.7.20-1.ius
 - Latest upstream
 - update Source12 from Fedora:
