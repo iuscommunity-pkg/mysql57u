@@ -81,8 +81,8 @@
 %bcond_with mecab
 
 Name:             mysql57u
-Version:          5.7.20
-Release:          2.ius%{?dist}
+Version:          5.7.21
+Release:          1.ius%{?dist}
 Summary:          MySQL client programs and shared libraries
 Group:            Applications/Databases
 URL:              http://www.mysql.com
@@ -1010,6 +1010,9 @@ fi
 
 
 %changelog
+* Mon Jan 15 2018 Ben Harper <ben.harper@rackspace.com> - 5.7.21-1.ius
+- Latest upstream
+
 * Fri Nov 10 2017 Ben Harper <ben.harper@rackspace.com> - 5.7.20-2.ius
 - fix log permissions from Ferora:
   https://src.fedoraproject.org/rpms/community-mysql/c/51a726ceaa5a822781e56b6767ed0d94f8a78503
