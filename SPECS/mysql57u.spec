@@ -176,8 +176,6 @@ Provides:         mysql-compat-client = %{sameevr}
 Provides:         mysql-compat-client%{?_isa} = %{sameevr}
 %endif
 
-%{?with_conflicts:Conflicts:        mariadb}
-
 # IUS-isms
 Provides:         mysql = %{sameevr}
 Provides:         mysql%{?_isa} = %{sameevr}
@@ -277,7 +275,6 @@ MySQL packages.
 %package          server
 Summary:          The MySQL server and related files
 Group:            Applications/Databases
-
 Requires:         %{name}%{?_isa} = %{sameevr}
 Requires:         %{name}-common%{?_isa} = %{sameevr}
 %{?with_config:Requires: %{name}-config%{?_isa} = %{sameevr}}
@@ -299,10 +296,6 @@ Requires(preun):  chkconfig
 Provides:         mysql-compat-server = %{sameevr}
 Provides:         mysql-compat-server%{?_isa} = %{sameevr}
 %endif
-
-%{?with_conflicts:Conflicts:        mariadb-server}
-%{?with_conflicts:Conflicts:        mariadb-galera-server}
-
 # IUS-isms
 Provides:         mysql-server = %{sameevr}
 Provides:         mysql-server%{?_isa} = %{sameevr}
@@ -323,9 +316,6 @@ Group:            Applications/Databases
 %{?with_clibrary:Requires: %{name}-libs%{?_isa} = %{sameevr}}
 Requires:         pkgconfig(openssl)
 Requires:         zlib-devel
-
-%{?with_conflicts:Conflicts:        mariadb-devel}
-
 # IUS-isms
 Provides:         mysql-devel = %{sameevr}
 Provides:         mysql-devel%{?_isa} = %{sameevr}
@@ -366,7 +356,6 @@ Requires:         libaio-devel
 Requires:         lz4-devel
 Requires:         pkgconfig(openssl)
 Requires:         zlib-devel
-%{?with_conflicts:Conflicts:        mariadb-embedded-devel}
 # IUS-isms
 Provides:         mysql-embedded-devel = %{sameevr}
 Provides:         mysql-embedded-devel%{?_isa} = %{sameevr}
@@ -401,9 +390,6 @@ Requires:         perl(Socket)
 Requires:         perl(Sys::Hostname)
 Requires:         perl(Test::More)
 Requires:         perl(Time::HiRes)
-
-%{?with_conflicts:Conflicts:        mariadb-test}
-
 # IUS-isms
 Provides:         mysql-test = %{sameevr}
 Provides:         mysql-test%{?_isa} = %{sameevr}
