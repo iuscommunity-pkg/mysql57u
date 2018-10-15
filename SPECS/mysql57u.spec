@@ -686,10 +686,6 @@ mkdir -p %{buildroot}%{_sysconfdir}/my.cnf.d
 rm %{buildroot}%{_sysconfdir}/my.cnf
 %endif
 
-%if %{without common}
-rm -r %{buildroot}%{_datadir}/%{pkg_name}/charsets
-%endif
-
 %if %{without errmsg}
 rm %{buildroot}%{_datadir}/%{pkg_name}/errmsg-utf8.txt
 rm -r %{buildroot}%{_datadir}/%{pkg_name}/{english,bulgarian,czech,danish,dutch,estonian,\
