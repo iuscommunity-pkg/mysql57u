@@ -1,0 +1,13 @@
+Include the library with function ADD_COMPILE_FLAGS()
+
+--- mysql-5.7.23/regex/CMakeLists.txt	2018-08-23 02:02:38.971432914 +0200
++++ mysql-5.7.23/regex/CMakeLists.txt_patched	2018-08-23 02:02:29.711608104 +0200
+@@ -15,6 +15,8 @@
+ 
+ INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/include)
+ 
++INCLUDE(${MYSQL_CMAKE_SCRIPT_DIR}/compile_flags.cmake)
++
+ MY_CHECK_C_COMPILER_FLAG("-Wstringop-truncation" HAVE_STRINGOP_TRUNCATION)
+ IF(HAVE_STRINGOP_TRUNCATION)
+   ADD_COMPILE_FLAGS(

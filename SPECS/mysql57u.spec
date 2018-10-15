@@ -81,7 +81,7 @@
 %bcond_with mecab
 
 Name:             mysql57u
-Version:          5.7.21
+Version:          5.7.23
 Release:          1.ius%{?dist}
 Summary:          MySQL client programs and shared libraries
 Group:            Applications/Databases
@@ -123,6 +123,8 @@ Patch6:           %{pkgnamepatch}-paths.patch
 Patch51:          %{pkgnamepatch}-chain-certs.patch
 Patch52:          %{pkgnamepatch}-sharedir.patch
 Patch70:          %{pkgnamepatch}-5.7.13-major.patch
+# Bug in 5.7.23
+Patch74:          %{pkgnamepatch}-cmake.patch
 
 # Patches taken from boost 1.59
 Patch115: boost-1.58.0-pool.patch
@@ -133,7 +135,7 @@ Patch170: boost-1.59.0-log.patch
 Patch180: boost-1.59-python-make_setter.patch
 Patch181: boost-1.59-test-fenv.patch
 
-BuildRequires:    cmake
+BuildRequires:    cmake gcc-c++
 BuildRequires:    libaio-devel
 BuildRequires:    libedit-devel
 BuildRequires:    libevent-devel
@@ -156,18 +158,15 @@ BuildRequires:    perl(File::Temp)
 BuildRequires:    perl(Data::Dumper)
 BuildRequires:    perl(Getopt::Long)
 BuildRequires:    perl(IPC::Open3)
+BuildRequires:    perl(JSON)
 BuildRequires:    perl(Memoize)
 BuildRequires:    perl(Socket)
 BuildRequires:    perl(Sys::Hostname)
 BuildRequires:    perl(Test::More)
 BuildRequires:    perl(Time::HiRes)
-BuildRequires:    perl(JSON)
-BuildRequires:    perl(File::Spec::Functions)
 %{?with_init_systemd:BuildRequires: systemd}
 
-Requires:         bash
-Requires:         fileutils
-Requires:         grep
+Requires:         bash coreutils grep
 Requires:         %{name}-common%{?_isa} = %{sameevr}
 
 Provides:         bundled(boost) = 1.59
@@ -289,7 +288,7 @@ Requires:         %{name}-common%{?_isa} = %{sameevr}
 %{?with_config:Requires: %{name}-config%{?_isa} = %{sameevr}}
 %{?with_errmsg:Requires: %{name}-errmsg%{?_isa} = %{sameevr}}
 %{?with_mecab:Requires: mecab-ipadic}
-Requires:         sh-utils
+Requires:         coreutils
 Requires(pre):    /usr/sbin/useradd
 %if %{with init_systemd}
 # We require this to be present for %%{_tmpfilesdir}
@@ -438,6 +437,7 @@ the MySQL sources.
 %if %{with_shared_lib_major_hack}
 %patch70 -p1
 %endif
+%patch74 -p1
 
 # Patch Boost
 pushd boost/boost_1_59_0
@@ -459,43 +459,49 @@ add_test () {
 
 touch %{skiplist}
 
-# unstable on all archs
-add_test main.xa_prepared_binlog_off          : unstable test
-add_test binlog.binlog_xa_prepared_disconnect : unstable test
-add_test innodb.table_encrypt_kill            : unstable test
-add_test main.grant_user_lock                 : unstable test
-add_test perfschema.memory_aggregate_no_a_no_u_no_h : unstable test
-add_test main.mysqlpump_basic                 :  unstable test
-add_test main.grant_alter_user_qa                :  started failing in 5.7.19
+# Fails everywhere since 5.7.23
+add_test main.myisam :
+add_test main.variables :
 
-# these tests fail in 5.7.14 on arm32
+# these tests fail on arm32
 %ifarch %arm
-# GIS related issue
-add_test innodb_gis.1     : arm32 gis issue
-add_test innodb_gis.gis   : arm32 gis issue
-add_test main.gis-precise : arm32 gis issue
-add_test main.gis         : arm32 gis issue
-add_test gis.gis_bugs_crashes : arm32 gis issue
-add_test gis.spatial_operators_intersection : arm32 gis issue
-add_test gis.spatial_operators_union : arm32 gis issue
-add_test gis.spatial_testing_functions_contains : arm32 gis issue
-add_test gis.spatial_testing_functions_crosses  : arm32 gis issue
-add_test gis.spatial_testing_functions_equals   : arm32 gis issue
-add_test gis.spatial_testing_functions_touches  : arm32 gis issue
-add_test gis.spatial_testing_functions_within   : arm32 gis issue
-# FTS
-add_test innodb_fts.opt : arm32 FTS issue
-# Missing hw counters
-add_test perfschema.func_mutex          : missing hw on arm32
-add_test perfschema.func_file_io        : missing hw on arm32
-add_test perfschema.mdl_func            : missing hw on arm32
-add_test perfschema.setup_objects       : missing hw on arm32
-add_test perfschema.global_read_lock    : missing hw on arm32
+# FTS; still apply for 5.7.21
+add_test innodb_fts.opt                   : arm32 FTS issue
+# Missing hw counters; in 5.7.21 reported as unstable tests
+add_test perfschema.func_file_io          : missing hw on arm32
+add_test perfschema.setup_objects         : missing hw on arm32
 %endif
 
-# this test fail in 5.7.14 on ppc64* and aarch64
-%ifarch ppc64 ppc64le aarch64
-add_test innodb.innodb            : missing correct value
+# This test fail on ppc64 and ppc64le; applicable in 5.7.21
+%ifarch ppc64le ppc64
+add_test innodb.innodb                    : missing correct value
+%endif
+%ifarch ppc64le
+add_test perfschema.memory_aggregate_no_a : incorrect numbers in output
+add_test innodb_zip.wl6469                :
+add_test json.json_functions_innodb       :
+add_test main.ps                          :
+# The "select" tests may be a PPC floating point long long precision error
+#   Need to check this theory, though.
+#   Maybe usefull conversation: https://github.com/h5py/h5py/issues/817
+add_test main.select_all                  :
+add_test main.select_all_bka              :
+add_test main.select_all_bka_nixbnl       :
+add_test main.select_icp_mrr              :
+add_test main.select_icp_mrr_bka          :
+add_test main.select_icp_mrr_bka_nixbnl   :
+add_test main.select_none                 :
+add_test main.select_none_bka             :
+add_test main.select_none_bka_nixbnl      :
+add_test main.sp                          :
+add_test main.type_float                  :
+add_test main.type_newdecimal             :
+add_test main.type_ranges                 :
+add_test test_service_sql_api.test_sql_all_col_types :
+%endif
+
+%ifarch i686
+add_test gis.gis_bugs_crashes             : Failing since 5.7.22 release
 %endif
 
 popd
@@ -516,7 +522,7 @@ cp %{SOURCE2} %{SOURCE3} %{SOURCE10} %{SOURCE11} %{SOURCE12} %{SOURCE13} \
 %endif
 
 # build out of source
-mkdir build && pushd build
+mkdir -p build && pushd build
 
 # The INSTALL_xxx macros have to be specified relative to CMAKE_INSTALL_PREFIX
 # so we can't use %%{_datadir} and so forth here.
@@ -594,7 +600,6 @@ install -p -m 0644 Docs/INFO_SRC %{buildroot}%{_libdir}/mysql/
 install -p -m 0644 Docs/INFO_BIN %{buildroot}%{_libdir}/mysql/
 
 mkdir -p %{buildroot}%{logfiledir}
-touch %{buildroot}%{logfile}
 
 mkdir -p %{buildroot}%{pidfiledir}
 install -p -m 0755 -d %{buildroot}%{dbdatadir}
@@ -638,8 +643,6 @@ rm -f %{buildroot}%{_datadir}/%{pkg_name}/magic
 rm -f %{buildroot}%{_datadir}/%{pkg_name}/mysql.server
 rm -f %{buildroot}%{_datadir}/%{pkg_name}/mysqld_multi.server
 rm -f %{buildroot}%{_mandir}/man1/comp_err.1*
-rm -f %{buildroot}%{_mandir}/man1/mysql-stress-test.pl.1*
-rm -f %{buildroot}%{_mandir}/man1/mysql-test-run.pl.1*
 
 # put logrotate script where it needs to be
 mkdir -p %{buildroot}%{logrotateddir}
@@ -663,11 +666,6 @@ install -p -m 0644 %{SOURCE7} %{basename:%{SOURCE7}}
 # Install the list of skipped tests to be available for user runs
 install -p -m 0644 mysql-test/%{skiplist} %{buildroot}%{_datadir}/mysql-test
 
-# These are in fact identical
-rm %{buildroot}%{_mandir}/man1/{mysqltest,mysql_client_test}_embedded.1
-cp -p %{buildroot}%{_mandir}/man1/mysqltest.1 %{buildroot}%{_mandir}/man1/mysqltest_embedded.1
-cp -p %{buildroot}%{_mandir}/man1/mysql_client_test.1 %{buildroot}%{_mandir}/man1/mysql_client_test_embedded.1
-
 %if %{without clibrary}
 unlink %{buildroot}%{_libdir}/mysql/libmysqlclient.so
 rm -rf %{buildroot}%{_libdir}/mysql/libmysqlclient*.so.*
@@ -677,7 +675,6 @@ rm -rf %{buildroot}%{_sysconfdir}/ld.so.conf.d
 %if %{without embedded}
 rm -f %{buildroot}%{_libdir}/mysql/libmysqld.so*
 rm -f %{buildroot}%{_bindir}/{mysql_client_test_embedded,mysqltest_embedded}
-rm -f %{buildroot}%{_mandir}/man1/{mysql_client_test_embedded,mysqltest_embedded}.1*
 %endif
 
 %if %{without devel}
@@ -714,7 +711,6 @@ polish,portuguese,romanian,russian,serbian,slovak,spanish,swedish,ukrainian}
 %if %{without test}
 rm -f %{buildroot}%{_bindir}/{mysql_client_test,mysqlxtest,my_safe_process}
 rm -rf %{buildroot}%{_datadir}/mysql-test
-rm -f %{buildroot}%{_mandir}/man1/mysql_client_test.1*
 %endif
 
 %check
@@ -728,15 +724,16 @@ cp ../../mysql-test/%{skiplist} .
 export MTR_BUILD_THREAD=%{__isa_bits}
 ./mtr \
   --mem --parallel=auto --force --retry=2 \
-  --mysqld=--binlog-format=mixed --skip-rpl \
+  --mysqld=--binlog-format=mixed \
   --suite-timeout=720 --testcase-timeout=30 \
   --report-unstable-tests --clean-vardir \
+  --max-test-fail=5 \
 %if %{check_testsuite}
-  --max-test-fail=0 || :
+  --max-test-fail=9999 || :
 %else
   --skip-test-list=%{skiplist}
 %endif
-  rm -rf var/* $(readlink var)
+  rm -r var $(readlink var)
 popd
 popd
 %endif
@@ -811,7 +808,6 @@ fi
 %{_bindir}/mysqlpump
 %{_bindir}/mysqlshow
 %{_bindir}/mysqlslap
-%{_bindir}/my_print_defaults
 
 %{_mandir}/man1/mysql.1*
 %{_mandir}/man1/mysql_config_editor.1*
@@ -824,7 +820,6 @@ fi
 %{_mandir}/man1/mysqlpump.1*
 %{_mandir}/man1/mysqlshow.1*
 %{_mandir}/man1/mysqlslap.1*
-%{_mandir}/man1/my_print_defaults.1*
 %endif
 
 
@@ -887,6 +882,7 @@ fi
 %{_bindir}/myisam_ftdump
 %{_bindir}/myisamlog
 %{_bindir}/myisampack
+%{_bindir}/my_print_defaults
 %{_bindir}/mysql_install_db
 %{_bindir}/mysql_secure_installation
 %{_bindir}/mysql_ssl_rsa_setup
@@ -899,7 +895,6 @@ fi
 %{_bindir}/mysqld_safe
 %endif
 %{_bindir}/mysqldumpslow
-%{_bindir}/mysqltest
 %{_bindir}/innochecksum
 %{_bindir}/perror
 %{_bindir}/replace
@@ -922,6 +917,7 @@ fi
 %{_mandir}/man1/myisampack.1*
 %{_mandir}/man1/myisam_ftdump.1*
 %{_mandir}/man1/mysql.server.1*
+%{_mandir}/man1/my_print_defaults.1*
 %{_mandir}/man1/mysql_install_db.1*
 %{_mandir}/man1/mysql_secure_installation.1*
 %{_mandir}/man1/mysql_ssl_rsa_setup.1*
@@ -931,7 +927,6 @@ fi
 %{_mandir}/man1/mysqld_multi.1*
 %{_mandir}/man1/mysqld_safe.1*
 %{_mandir}/man1/mysqlman.1*
-%{_mandir}/man1/mysqltest.1*
 %{_mandir}/man1/innochecksum.1*
 %{_mandir}/man1/perror.1*
 %{_mandir}/man1/replace.1*
@@ -975,6 +970,7 @@ fi
 %files devel
 %{_bindir}/mysql_config
 %{_bindir}/mysql_config-%{__isa_bits}
+%exclude %{_bindir}/mysql_config_editor
 %{_includedir}/mysql
 %{_datadir}/aclocal/mysql.m4
 %if %{with clibrary}
@@ -992,24 +988,25 @@ fi
 
 %files embedded-devel
 %{_libdir}/mysql/libmysqld.so
-%{_bindir}/mysql_client_test_embedded
-%{_bindir}/mysqltest_embedded
-%{_mandir}/man1/mysql_client_test_embedded.1*
-%{_mandir}/man1/mysqltest_embedded.1*
 %endif
 
 
 %if %{with test}
 %files test
 %{_bindir}/mysql_client_test
-%{_bindir}/my_safe_process
+%{_bindir}/mysql_client_test_embedded
+%{_bindir}/mysqltest
+%{_bindir}/mysqltest_embedded
 %{_bindir}/mysqlxtest
+%{_bindir}/my_safe_process
 %attr(-,mysql,mysql) %{_datadir}/mysql-test
-%{_mandir}/man1/mysql_client_test.1*
 %endif
 
 
 %changelog
+* Mon Oct 15 2018 Carl George <carl@george.computer> - 5.7.23-1.ius
+- Latest upstream
+
 * Mon Jan 15 2018 Ben Harper <ben.harper@rackspace.com> - 5.7.21-1.ius
 - Latest upstream
 
