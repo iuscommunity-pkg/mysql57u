@@ -24,7 +24,7 @@
 # Turn that off to ensure such files don't get included in RPMs (cf bz#884755).
 %global _default_patch_flags --no-backup-if-mismatch
 
-%global           skiplist platform-specific-tests.list
+%global skiplist platform-specific-tests.list
 
 # For some use cases we do not need some parts of the package
 %bcond_without clibrary
@@ -178,12 +178,11 @@ Provides:         mysql-compat-client%{?_isa} = %{sameevr}
 
 %{?with_conflicts:Conflicts:        mariadb}
 
-Requires:         mysqlclient16
-
-# safe replacement
+# IUS-isms
 Provides:         mysql = %{sameevr}
 Provides:         mysql%{?_isa} = %{sameevr}
 Conflicts:        mysql < %{sameevr}
+Requires:         mysqlclient16
 
 # Filtering: https://fedoraproject.org/wiki/Packaging:AutoProvidesAndRequiresFiltering
 %if 0%{?fedora} > 14 || 0%{?rhel} > 6
@@ -208,8 +207,7 @@ contains the standard MySQL client programs and generic MySQL files.
 Summary:          The shared libraries required for MySQL clients
 Group:            Applications/Databases
 Requires:         %{name}-common%{?_isa} = %{sameevr}
-
-# safe replacement
+# IUS-isms
 Provides:         mysql-libs = %{sameevr}
 Provides:         mysql-libs%{?_isa} = %{sameevr}
 Conflicts:        mysql-libs < %{sameevr}
@@ -227,8 +225,7 @@ MySQL server.
 %package          config
 Summary:          The config files required by server and client
 Group:            Applications/Databases
-
-# safe replacement
+# IUS-isms
 Provides:         mysql-config = %{sameevr}
 Provides:         mysql-config%{?_isa} = %{sameevr}
 Conflicts:        mysql-config < %{sameevr}
@@ -247,8 +244,7 @@ package itself.
 Summary:          The shared files required for MySQL server and client
 Group:            Applications/Databases
 %{?with_config:Requires: %{name}-config%{?_isa} = %{sameevr}}
-
-# safe replacement
+# IUS-isms
 Provides:         mysql-common = %{sameevr}
 Provides:         mysql-common%{?_isa} = %{sameevr}
 Conflicts:        mysql-common < %{sameevr}
@@ -265,8 +261,7 @@ MySQL package.
 Summary:          The error messages files required by server and embedded
 Group:            Applications/Databases
 Requires:         %{name}-common%{?_isa} = %{sameevr}
-
-# safe replacement
+# IUS-isms
 Provides:         mysql-errmsg = %{sameevr}
 Provides:         mysql-errmsg%{?_isa} = %{sameevr}
 Conflicts:        mysql-errmsg < %{sameevr}
@@ -308,7 +303,7 @@ Provides:         mysql-compat-server%{?_isa} = %{sameevr}
 %{?with_conflicts:Conflicts:        mariadb-server}
 %{?with_conflicts:Conflicts:        mariadb-galera-server}
 
-# safe replacement
+# IUS-isms
 Provides:         mysql-server = %{sameevr}
 Provides:         mysql-server%{?_isa} = %{sameevr}
 Conflicts:        mysql-server < %{sameevr}
@@ -331,7 +326,7 @@ Requires:         zlib-devel
 
 %{?with_conflicts:Conflicts:        mariadb-devel}
 
-# safe replacement
+# IUS-isms
 Provides:         mysql-devel = %{sameevr}
 Provides:         mysql-devel%{?_isa} = %{sameevr}
 Conflicts:        mysql-devel < %{sameevr}
@@ -350,8 +345,7 @@ Summary:          MySQL as an embeddable library
 Group:            Applications/Databases
 Requires:         %{name}-common%{?_isa} = %{sameevr}
 %{?with_errmsg:Requires: %{name}-errmsg%{?_isa} = %{sameevr}}
-
-# safe replacement
+# IUS-isms
 Provides:         mysql-embedded = %{sameevr}
 Provides:         mysql-embedded%{?_isa} = %{sameevr}
 Conflicts:        mysql-embedded < %{sameevr}
@@ -373,8 +367,7 @@ Requires:         lz4-devel
 Requires:         pkgconfig(openssl)
 Requires:         zlib-devel
 %{?with_conflicts:Conflicts:        mariadb-embedded-devel}
-
-# safe replacement
+# IUS-isms
 Provides:         mysql-embedded-devel = %{sameevr}
 Provides:         mysql-embedded-devel%{?_isa} = %{sameevr}
 Conflicts:        mysql-embedded-devel < %{sameevr}
@@ -411,7 +404,7 @@ Requires:         perl(Time::HiRes)
 
 %{?with_conflicts:Conflicts:        mariadb-test}
 
-# safe replacement
+# IUS-isms
 Provides:         mysql-test = %{sameevr}
 Provides:         mysql-test%{?_isa} = %{sameevr}
 Conflicts:        mysql-test < %{sameevr}
@@ -614,7 +607,7 @@ install -D -p -m 0644 scripts/my.cnf %{buildroot}%{_sysconfdir}/my.cnf
 %if %{with init_systemd}
 install -D -p -m 644 scripts/mysql.service %{buildroot}%{_unitdir}/%{daemon_name}.service
 install -D -p -m 0644 scripts/mysql.tmpfiles.d %{buildroot}%{_tmpfilesdir}/%{daemon_name}.conf
-rm -rf %{buildroot}%{_tmpfilesdir}/mysql.conf
+rm -r %{buildroot}%{_tmpfilesdir}/mysql.conf
 %endif
 
 # install SysV init script
@@ -637,12 +630,12 @@ mv %{buildroot}%{_datadir}/mysql-test/lib/My/SafeProcess/my_safe_process %{build
 ln -s ../../../../../bin/my_safe_process %{buildroot}%{_datadir}/mysql-test/lib/My/SafeProcess/my_safe_process
 
 # not needed in rpm package
-rm -f %{buildroot}%{_bindir}/mysql_embedded
-rm -f %{buildroot}%{_libdir}/mysql/*.a
-rm -f %{buildroot}%{_datadir}/%{pkg_name}/magic
-rm -f %{buildroot}%{_datadir}/%{pkg_name}/mysql.server
-rm -f %{buildroot}%{_datadir}/%{pkg_name}/mysqld_multi.server
-rm -f %{buildroot}%{_mandir}/man1/comp_err.1*
+rm %{buildroot}%{_bindir}/mysql_embedded
+rm %{buildroot}%{_libdir}/mysql/*.a
+rm %{buildroot}%{_datadir}/%{pkg_name}/magic
+rm %{buildroot}%{_datadir}/%{pkg_name}/mysql.server
+rm %{buildroot}%{_datadir}/%{pkg_name}/mysqld_multi.server
+rm %{buildroot}%{_mandir}/man1/comp_err.1*
 
 # put logrotate script where it needs to be
 mkdir -p %{buildroot}%{logrotateddir}
@@ -668,29 +661,29 @@ install -p -m 0644 mysql-test/%{skiplist} %{buildroot}%{_datadir}/mysql-test
 
 %if %{without clibrary}
 unlink %{buildroot}%{_libdir}/mysql/libmysqlclient.so
-rm -rf %{buildroot}%{_libdir}/mysql/libmysqlclient*.so.*
-rm -rf %{buildroot}%{_sysconfdir}/ld.so.conf.d
+rm -r %{buildroot}%{_libdir}/mysql/libmysqlclient*.so.*
+rm -r %{buildroot}%{_sysconfdir}/ld.so.conf.d
 %endif
 
 %if %{without embedded}
-rm -f %{buildroot}%{_libdir}/mysql/libmysqld.so*
-rm -f %{buildroot}%{_bindir}/{mysql_client_test_embedded,mysqltest_embedded}
+rm %{buildroot}%{_libdir}/mysql/libmysqld.so*
+rm %{buildroot}%{_bindir}/{mysql_client_test_embedded,mysqltest_embedded}
 %endif
 
 %if %{without devel}
-rm -f %{buildroot}%{_bindir}/mysql_config*
-rm -rf %{buildroot}%{_includedir}/mysql
-rm -f %{buildroot}%{_datadir}/aclocal/mysql.m4
-rm -f %{buildroot}%{_libdir}/pkgconfig/mysqlclient.pc
-rm -f %{buildroot}%{_libdir}/mysql/libmysqlclient*.so
-rm -f %{buildroot}%{_mandir}/man1/mysql_config.1*
+rm %{buildroot}%{_bindir}/mysql_config*
+rm -r %{buildroot}%{_includedir}/mysql
+rm %{buildroot}%{_datadir}/aclocal/mysql.m4
+rm %{buildroot}%{_libdir}/pkgconfig/mysqlclient.pc
+rm %{buildroot}%{_libdir}/mysql/libmysqlclient*.so
+rm %{buildroot}%{_mandir}/man1/mysql_config.1*
 %endif
 
 %if %{without client}
-rm -f %{buildroot}%{_bindir}/{mysql,mysql_config_editor,\
+rm %{buildroot}%{_bindir}/{mysql,mysql_config_editor,\
 mysql_plugin,mysqladmin,mysqlbinlog,\
 mysqlcheck,mysqldump,mysqlpump,mysqlimport,mysqlshow,mysqlslap,my_print_defaults}
-rm -f %{buildroot}%{_mandir}/man1/{mysql,mysql_config_editor,\
+rm %{buildroot}%{_mandir}/man1/{mysql,mysql_config_editor,\
 mysql_plugin,mysqladmin,mysqlbinlog,\
 mysqlcheck,mysqldump,mysqlpump,mysqlimport,mysqlshow,mysqlslap,my_print_defaults}.1*
 %endif
@@ -698,19 +691,23 @@ mysqlcheck,mysqldump,mysqlpump,mysqlimport,mysqlshow,mysqlslap,my_print_defaults
 %if %{with config}
 mkdir -p %{buildroot}%{_sysconfdir}/my.cnf.d
 %else
-rm -f %{buildroot}%{_sysconfdir}/my.cnf
+rm %{buildroot}%{_sysconfdir}/my.cnf
+%endif
+
+%if %{without common}
+rm -r %{buildroot}%{_datadir}/%{pkg_name}/charsets
 %endif
 
 %if %{without errmsg}
-rm -f %{buildroot}%{_datadir}/%{pkg_name}/errmsg-utf8.txt
-rm -rf %{buildroot}%{_datadir}/%{pkg_name}/{english,bulgarian,czech,danish,dutch,estonian,\
+rm %{buildroot}%{_datadir}/%{pkg_name}/errmsg-utf8.txt
+rm -r %{buildroot}%{_datadir}/%{pkg_name}/{english,bulgarian,czech,danish,dutch,estonian,\
 french,german,greek,hungarian,italian,japanese,korean,norwegian,norwegian-ny,\
 polish,portuguese,romanian,russian,serbian,slovak,spanish,swedish,ukrainian}
 %endif
 
 %if %{without test}
-rm -f %{buildroot}%{_bindir}/{mysql_client_test,mysqlxtest,my_safe_process}
-rm -rf %{buildroot}%{_datadir}/mysql-test
+rm %{buildroot}%{_bindir}/{mysql_client_test,mysqlxtest,my_safe_process}
+rm -r %{buildroot}%{_datadir}/mysql-test
 %endif
 
 %check
@@ -739,18 +736,22 @@ popd
 %endif
 %endif
 
+
 %pre server
 /usr/sbin/groupadd -g 27 -o -r mysql >/dev/null 2>&1 || :
 /usr/sbin/useradd -M -N -g mysql -o -r -d %{mysqluserhome} -s /sbin/nologin \
   -c "MySQL Server" -u 27 mysql >/dev/null 2>&1 || :
 
+
 %if %{with clibrary}
-%post libs -p /sbin/ldconfig
+%ldconfig_post libs
 %endif
 
+
 %if %{with embedded}
-%post embedded -p /sbin/ldconfig
+%ldconfig_post embedded
 %endif
+
 
 %post server
 %if %{with init_systemd}
@@ -765,6 +766,7 @@ if [ ! -e "%{logfile}" -a ! -h "%{logfile}" ] ; then
     install /dev/null -m0640 -omysql -gmysql "%{logfile}"
 fi
 
+
 %preun server
 %if %{with init_systemd}
 %systemd_preun %{daemon_name}.service
@@ -776,13 +778,16 @@ if [ $1 = 0 ]; then
 fi
 %endif
 
+
 %if %{with clibrary}
-%postun libs -p /sbin/ldconfig
+%ldconfig_postun libs
 %endif
 
+
 %if %{with embedded}
-%postun embedded -p /sbin/ldconfig
+%ldconfig_postun embedded
 %endif
+
 
 %postun server
 %if %{with init_systemd}
