@@ -141,6 +141,9 @@ BuildRequires:    libedit-devel
 BuildRequires:    libevent-devel
 BuildRequires:    lz4-devel
 %{?with_mecab:BuildRequires: mecab-devel}
+%ifnarch aarch64 %{arm} s390 s390x
+BuildRequires:    numactl-devel
+%endif
 BuildRequires:    openssl-devel
 BuildRequires:    perl
 BuildRequires:    systemtap-sdt-devel
@@ -539,6 +542,9 @@ cmake .. \
          -DSYSTEMD_PID_DIR="%{pidfiledir}" \
 %endif
          -DWITH_INNODB_MEMCACHED=ON \
+%ifnarch aarch64 %{arm} s390 s390x
+         -DWITH_NUMA=ON \
+%endif
          -DWITH_EMBEDDED_SERVER=ON \
          -DWITH_EMBEDDED_SHARED_LIBRARY=ON \
          -DWITH_EDITLINE=system \
@@ -997,6 +1003,7 @@ fi
 %changelog
 * Mon Oct 15 2018 Carl George <carl@george.computer> - 5.7.23-1.ius
 - Latest upstream
+- Enable numa support
 
 * Mon Jan 15 2018 Ben Harper <ben.harper@rackspace.com> - 5.7.21-1.ius
 - Latest upstream
