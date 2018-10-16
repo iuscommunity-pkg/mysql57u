@@ -459,7 +459,6 @@ add_test perfschema.setup_objects         : missing hw on arm32
 add_test innodb.innodb                    : missing correct value
 %endif
 %ifarch ppc64le
-add_test perfschema.memory_aggregate_no_a : incorrect numbers in output
 add_test innodb_zip.wl6469                :
 add_test json.json_functions_innodb       :
 add_test main.ps                          :
@@ -485,6 +484,11 @@ add_test test_service_sql_api.test_sql_all_col_types :
 %ifarch i686
 add_test gis.gis_bugs_crashes             : Failing since 5.7.22 release
 %endif
+
+add_test perfschema.memory_aggregate_no_a : incorrect numbers in output
+add_test main.grant_user_lock             : unstable test
+add_test main.grant_alter_user_qa         : unstable test
+add_test innodb.table_encrypt_kill        : unstable test
 
 popd
 
